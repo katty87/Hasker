@@ -1,0 +1,55 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+label {
+  /* Uniform size & alignment */
+  display: inline-block;
+  width: 30px;
+  text-align: right;
+  vertical-align: top;
+}
+
+input,
+textarea {
+  font: 1em sans-serif;
+  width: 300px;
+  box-sizing: border-box;
+  border: 1px solid #999;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #000;
+}
+
+.button {
+  padding-left: 30px;
+}
+
+button {
+  margin-left: .3em;
+}
+</style>
+
+  <h2>Ask a question</h2>
+  <form method="post">
+    {% csrf_token %}
+    <ul style="list-style: none">
+      <li>
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title">
+      <li>
+
+
+      <li>
+        <label for="content">Text</label>
+        <textarea id="content" name="content" rows="10"></textarea>
+      </li>
+
+      <li class="button">
+        <button type="submit" >Ask!</button>
+      </li>
+    </ul>
+  </form>
+{% endblock %}
