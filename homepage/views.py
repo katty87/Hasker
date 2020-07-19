@@ -26,7 +26,7 @@ def ask_view(request):
         question_instance.user = User.objects.get(username='admin')
         question_instance.save()
 
-        return redirect('question_view', question_id=question_instance.id)
+        return redirect('question_detail', question_id=question_instance.id)
     else:
         form = AddQuestionForm()
 
