@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Main page</h1>
+{% if question_list %}
+    <ul>
+    {% for question in question_list %}
+        <li><a href="question_{{ question.id }}/">{{ question.header }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+{% endblock %}

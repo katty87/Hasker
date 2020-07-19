@@ -5,13 +5,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.template import loader
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, UserProfile
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the hasker index.")
+    question_list = Question.objects.all()
+    context = {'question_list': question_list}
+    return render(request, 'homepage/index.html', context)
 
 
 # @login_required
