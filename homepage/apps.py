@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class HaskerappConfig(AppConfig):
+class HomepageConfig(AppConfig):
     name = 'homepage'
