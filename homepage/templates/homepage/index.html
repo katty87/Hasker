@@ -1,16 +1,50 @@
 {% extends "base_generic.html" %}
 
+{% block scripts %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+{% endblock %}
+
 {% block content %}
 
-<h1>Main page</h1>
-{% if question_list %}
-    <ul>
-    {% for question in question_list %}
-        <li><a href="question_{{ question.id }}/">{{ question.header }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
+<div class="container">
+  <!-- Nav pills -->
+  <ul class="nav nav-pills" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="pill" href="#new_questions"><h3>New questions</h3></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="pill" href="#hot_questions"><h3>Hot questions</h3></a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div id="new_question" class="container tab-pane active"><br>
+        {% if question_list %}
+            <ul>
+            {% for question in question_list %}
+                <li><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No questions.</p>
+        {% endif %}
+    </div>
+    <div id="hot_questions" class="container tab-pane fade"><br>
+        {% if question_list %}
+            <ul>
+            {% for question in question_list %}
+                <li><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No questions.</p>
+        {% endif %}
+    </div>
+  </div>
+</div>
+
 
 {% endblock %}

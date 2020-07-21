@@ -4,5 +4,23 @@
 
 <h3>{{ question.header }}</h3>
 {{ question.content }}
+{% for answer in question.answer_set.all %}
+    <li>{{ answer.content }}</li>
+{% endfor %}
+
+<br>
+<br>
+
+<form action="{% url 'answer_question' question.id %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="answer">Your answer</label>
+        <textarea class="form-control" name="answer_text" id="answer" rows="3"></textarea>
+    </div>
+
+    <div class="button">
+        <input type="submit" class="btn btn-primary" value="Post your answer"/>
+    </div>
+</form>
 
 {% endblock %}

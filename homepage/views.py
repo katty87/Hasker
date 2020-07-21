@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.template import loader
 
 from homepage.forms import SignUpForm, AddQuestionForm
-from homepage.models import Question, UserProfile
+from homepage.models import Question, UserProfile, Answer
 
 
 def index(request):
@@ -44,6 +44,17 @@ def ask_view(request):
 def question_view(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'homepage/detail_question.html', {'question': question})
+
+
+def answer_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    answer = Answer()
+    answer.content = request.POST['answer_text']
+    answer.question = question
+    answer.is_correct = False
+    answer.save()
+    return redirect('question_detail', question_id=question.id)
 
 
 def signup_view(request):
