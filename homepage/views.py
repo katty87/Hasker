@@ -6,15 +6,29 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.template import loader
+from django.db.models import Q
+from django.views import generic
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, UserProfile, Answer
 
 
-def index(request):
-    question_list = Question.objects.all()
-    context = {'question_list': question_list}
-    return render(request, 'homepage/index.html', context)
+class IndexView(generic.ListView):
+    template_name = 'homepage/index.html'
+    context_object_name = 'question_list'
+
+    def get_queryset(self):
+        return Question.objects.all()
+
+
+class SearchResultsView(generic.ListView):
+    model = Question
+    template_name = 'homepage/search_results.html'
+    context_object_name = 'question_list'
+
+    def get_queryset(self):
+        search_string = self.request.GET.get('q')
+        return Question.objects.filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
 
 
 # @login_required

@@ -1,5 +1,19 @@
 {% extends "base_generic.html" %}
 
+{% block scripts %}
+<script>
+	var state = 0;
+
+	function onClickUpVote() {
+		if ({{ question.current_user_vote }} == 1) {
+  			document.getElementById("up-vote").style.color = "orange";
+  		} else {
+  			document.getElementById("up-vote").style.color = "#D3D3D3";
+  		}
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
@@ -7,9 +21,9 @@
 <div class="row">
   <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
 
-     <div class="fa fa-caret-up" id="up-vote" style="font-size:36px" onclick="myFunction()"></div>
+     <div class="fa fa-caret-up" id="up-vote" style="color:#D3D3D3;font-size:36px" onclick="onClickUpVote()"></div>
      <div>{{ question.vote_count }}</div>
-     <div class="fa fa-caret-down" style="color:red;font-size:36px"></div>
+     <div class="fa fa-caret-down" style="color:#D3D3D3;font-size:36px" onclick="onClickDownVote()"></div>
 
    </div>
    <div class="col-md-2">

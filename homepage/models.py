@@ -21,6 +21,9 @@ class Question(models.Model):
         cnt = QuestionVote.objects.filter(question_id=self.id).aggregate(Sum('value')).get('value__sum')
         return cnt if cnt else 0
 
+    def current_user_vote(self):
+        return 1
+
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
