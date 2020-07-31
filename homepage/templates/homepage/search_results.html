@@ -4,5 +4,14 @@
 
     <h1>Search results</h1>
 
-   {{ block.super }}
+    {% if question_list %}
+        <ul>
+        {% for question in question_list %}
+            <li><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No questions.</p>
+    {% endif %}
+
 {% endblock %}

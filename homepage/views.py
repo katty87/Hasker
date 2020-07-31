@@ -55,20 +55,20 @@ def ask_view(request):
     return render(request, 'homepage/add_question.html', context)
 
 
-def question_view(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'homepage/detail_question.html', {'question': question})
+class QuestionDetailView(generic.DetailView):
+    model = Question
+    template_name = 'homepage/detail_question.html'
 
 
-def answer_question(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+def answer_question(request, pk):
+    question = get_object_or_404(Question, pk=pk)
 
     answer = Answer()
     answer.content = request.POST['answer_text']
     answer.question = question
     answer.is_correct = False
     answer.save()
-    return redirect('question_detail', question_id=question.id)
+    return redirect('question_detail', pk=question.id)
 
 
 def signup_view(request):

@@ -21,10 +21,17 @@
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
 
-        <div align="right">
-            <button type="button" class="btn btn-link">Log In</button>
-            <button type="button" class="btn btn-outline-primary">Sign Up</button>
-        </div>
+        {% if user.is_authenticated %}
+            <div align="right">
+                <a class="btn btn-link" >{{ user.username }}</a>
+                <a class="btn btn-outline-primary" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
+            </div>
+        {% else %}
+            <div align="right">
+                <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
+                <a class="btn btn-outline-primary">Sign Up</a>
+            </div>
+        {% endif %}
     </nav>
     <br>
     <div class="container-fluid">

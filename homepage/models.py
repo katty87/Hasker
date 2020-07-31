@@ -7,8 +7,8 @@ from django.db.models import Sum
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # avatar = models.ImageField(required=False)
-    birth_date = models.DateField(null=True, blank=True)
+    avatar = models.ImageField(null=True)
+    # birth_date = models.DateField(null=True, blank=True)
 
 
 class Question(models.Model):
