@@ -1,9 +1,12 @@
 {% extends "base_generic.html" %}
 
+{% load static %}
+
 {% block scripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
 <script>
-	function onClickUpVote() {
+    	function onClickUpVote() {
         vote(1)
     }
 
@@ -72,6 +75,7 @@
 
     }
 </script>
+
 {% endblock %}
 
 {% block content %}

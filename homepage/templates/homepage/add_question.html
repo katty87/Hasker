@@ -1,55 +1,102 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block scripts %}
+  <link href='{% static "homepage/css/jquery.tagit.css" %}' rel="stylesheet" type="text/css">
+  <link href='{% static "homepage/css/tagit.ui-zendesk.css" %}' rel="stylesheet" type="text/css">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src='{% static "homepage/js/tag-it.js" %}' type="text/javascript" charset="utf-8"></script>
+
+
+  <script>
+    var tags = {{ tags|safe }};
+
+
+      $(function(){
+
+          var sampleTags = tags;
+
+          //-------------------------------
+          // Tag events
+          //-------------------------------
+          var eventTags = $('#eventTags');
+
+          var addEvent = function(text) {
+              $('#events_container').append(text + '<br>');
+          };
+
+          eventTags.tagit({
+              availableTags: sampleTags,
+              beforeTagAdded: function(evt, ui) {
+                  if (!ui.duringInitialization) {
+                      addEvent('beforeTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
+                  }
+              },
+              afterTagAdded: function(evt, ui) {
+                  if (!ui.duringInitialization) {
+                      addEvent('afterTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
+                  }
+              },
+              beforeTagRemoved: function(evt, ui) {
+                  addEvent('beforeTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
+              },
+              afterTagRemoved: function(evt, ui) {
+                  addEvent('afterTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
+              },
+              onTagClicked: function(evt, ui) {
+                  addEvent('onTagClicked: ' + eventTags.tagit('tagLabel', ui.tag));
+              },
+              onTagExists: function(evt, ui) {
+                  addEvent('onTagExists: ' + eventTags.tagit('tagLabel', ui.existingTag));
+              }
+          });
+
+      });
+  </script>
+{% endblock %}
 
 {% block content %}
-<style>
-label {
-  /* Uniform size & alignment */
-  display: inline-block;
-  width: 30px;
-  text-align: right;
-  vertical-align: top;
-}
-
-input,
-textarea {
-  font: 1em sans-serif;
-  width: 300px;
-  box-sizing: border-box;
-  border: 1px solid #999;
-}
-
-input:focus,
-textarea:focus {
-  border-color: #000;
-}
-
-.button {
-  padding-left: 30px;
-}
-
-button {
-  margin-left: .3em;
-}
-</style>
 
   <h2>Ask a question</h2>
+  <br>
   <form method="post">
     {% csrf_token %}
-    <ul style="list-style: none">
-      <li>
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title">
-      <li>
+
+    <div class="form-group row">
+      <label for="title" class="col-sm-2 col-form-label">Title</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="title">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="content" class="col-sm-2 col-form-label">Text</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" id="content" rows="3"></textarea>
+      </div>
+    </div>
+      <div class="form-group row">
+        <label for="eventTags" class="col-sm-2 col-form-label">Tags</label>
+        <div class="col-sm-10">
+          <ul id="eventTags"></ul>
+        </div>
+      </div>
+    <div class="form-group row">
+      <div class="col-sm-2">
+        <button type="submit" class="btn btn-primary">Ask!</button>
+      </div>
+    </div>
+  </form>
+
+    <div class="form-group row">
+      <div class="col-sm-2">
+        <button class="btn btn-primary" onclick="onShowTags()">Show tags!</button>
+      </div>
+    </div>
 
 
-      <li>
-        <label for="content">Text</label>
-        <textarea id="content" name="content" rows="10"></textarea>
-      </li>
-
-      <li class="button">
-        <button type="submit" >Ask!</button>
-      </li>
-    </ul>
   </form>
 {% endblock %}
