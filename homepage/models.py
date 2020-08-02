@@ -22,7 +22,12 @@ class Question(models.Model):
         return cnt if cnt else 0
 
     def current_user_vote(self, user_id):
-        return 1
+        try:
+            question_vote = QuestionVote.objects.get(question_id=self.id, user_id=user_id)
+        except QuestionVote.DoesNotExist:
+            return 0
+
+        return question_vote.value
 
 
 class Answer(models.Model):
@@ -33,7 +38,12 @@ class Answer(models.Model):
     is_correct = models.BooleanField()
 
     def current_user_vote(self, user_id):
-        return 1
+        try:
+            question_vote = QuestionVote.objects.get(question_id=self.id, user_id=user_id)
+        except QuestionVote.DoesNotExist:
+            return 0
+
+        return question_vote.value
 
 
 class AnswerVote(models.Model):
