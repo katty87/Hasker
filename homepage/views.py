@@ -9,6 +9,7 @@ from django.template import loader
 from django.db.models import Q
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, QuestionVote, Answer
@@ -112,7 +113,7 @@ def vote_question(request):
 
     question_vote.save()
 
-    return HttpResponse(question_vote.value)
+    return JsonResponse({'current_vote': question_vote.value, 'total_votes': question.vote_count()})
 
 
 def signup_view(request):

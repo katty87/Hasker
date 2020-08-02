@@ -17,6 +17,7 @@ class Question(models.Model):
     create_date = models.DateTimeField()
 
     def vote_count(self):
+        print('vote_count')
         cnt = QuestionVote.objects.filter(question_id=self.id).aggregate(Sum('value')).get('value__sum')
         return cnt if cnt else 0
 
