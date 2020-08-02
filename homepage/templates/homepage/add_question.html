@@ -12,16 +12,12 @@
 
 
   <script>
-    var tags = {{ tags|safe }};
-
+      var all_tags = {{ tags|safe }};
 
       $(function(){
 
-          var sampleTags = tags;
+          var sampleTags = all_tags;
 
-          //-------------------------------
-          // Tag events
-          //-------------------------------
           var eventTags = $('#eventTags');
 
           var addEvent = function(text) {
@@ -30,28 +26,8 @@
 
           eventTags.tagit({
               availableTags: sampleTags,
-              beforeTagAdded: function(evt, ui) {
-                  if (!ui.duringInitialization) {
-                      addEvent('beforeTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
-                  }
-              },
-              afterTagAdded: function(evt, ui) {
-                  if (!ui.duringInitialization) {
-                      addEvent('afterTagAdded: ' + eventTags.tagit('tagLabel', ui.tag));
-                  }
-              },
-              beforeTagRemoved: function(evt, ui) {
-                  addEvent('beforeTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
-              },
-              afterTagRemoved: function(evt, ui) {
-                  addEvent('afterTagRemoved: ' + eventTags.tagit('tagLabel', ui.tag));
-              },
-              onTagClicked: function(evt, ui) {
-                  addEvent('onTagClicked: ' + eventTags.tagit('tagLabel', ui.tag));
-              },
-              onTagExists: function(evt, ui) {
-                  addEvent('onTagExists: ' + eventTags.tagit('tagLabel', ui.existingTag));
-              }
+              singleField: true,
+              tagLimit: 3,
           });
 
       });
@@ -68,14 +44,14 @@
     <div class="form-group row">
       <label for="title" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="title">
+        <input type="text" class="form-control" id="title" name="title">
       </div>
     </div>
 
     <div class="form-group row">
       <label for="content" class="col-sm-2 col-form-label">Text</label>
       <div class="col-sm-10">
-        <textarea class="form-control" id="content" rows="3"></textarea>
+        <textarea class="form-control" id="content" name="content" rows="3"></textarea>
       </div>
     </div>
       <div class="form-group row">
@@ -90,13 +66,6 @@
       </div>
     </div>
   </form>
-
-    <div class="form-group row">
-      <div class="col-sm-2">
-        <button class="btn btn-primary" onclick="onShowTags()">Show tags!</button>
-      </div>
-    </div>
-
 
   </form>
 {% endblock %}

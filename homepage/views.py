@@ -10,9 +10,10 @@ from django.db.models import Q
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+import json
 
 from homepage.forms import SignUpForm, AddQuestionForm
-from homepage.models import Question, QuestionVote, Answer
+from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag
 
 
 class IndexView(generic.ListView):
@@ -39,19 +40,33 @@ def ask_view(request):
 
     if request.method == 'POST':
         form = AddQuestionForm(request.POST)
-        question_instance.header = form.data['title']
-        question_instance.content = form.data['content']
-        question_instance.create_date = datetime.now()
-        question_instance.user = request.user
-        question_instance.save()
+        if form.is_valid():
+            question_instance.header = form.cleaned_data['title']
+            question_instance.content = form.cleaned_data['content']
+            question_instance.create_date = datetime.now()
+            question_instance.user = request.user
+            question_instance.save()
 
-        return redirect('question_detail', pk=question_instance.id)
+            tags = form.data['tags'].split(',')
+            for tag_name in tags:
+                tag = Tag.objects.filter(name=tag_name).first()
+                if not tag:
+                    tag = Tag()
+                    tag.name = tag_name
+                    tag.save()
+                question_instance.tags.add(tag)
+
+            if tags:
+                question_instance.save()
+
+            return redirect('question_detail', pk=question_instance.id)
     else:
         form = AddQuestionForm()
 
     context = {
         'form': form,
         'question_instance': question_instance,
+        'tags': json.dumps(list(Tag.objects.all().values_list('name', flat=True)))
     }
 
     return render(request, 'homepage/add_question.html', context)
@@ -69,8 +84,7 @@ class QuestionDetailView(generic.DetailView):
         context = super(QuestionDetailView, self).get_context_data(**kwargs)
         question = self.get_object()
         context.update({'question_vote': question.current_user_vote(user_id)})
-        # for answer in question.answer_set:
-        #    context.update({'answer:{}'.format(answer.id): answer.current_user_vote(user_id)})
+
         return context
 
 
@@ -87,6 +101,7 @@ def answer_question(request, pk):
     return redirect('question_detail', pk=question.id)
 
 
+@login_required
 def vote_question(request):
     question_id = request.POST.get('question_id')
     value = request.POST.get('value')
@@ -95,7 +110,7 @@ def vote_question(request):
     try:
         question = Question.objects.get(pk=question_id)
         user = User.objects.get(pk=user_id)
-    except Question.DoesNotExist:
+    except (User.DoesNotExist, Question.DoesNotExist) as e:
         return HttpResponse(0)
 
     try:
@@ -114,6 +129,36 @@ def vote_question(request):
     question_vote.save()
 
     return JsonResponse({'current_vote': question_vote.value, 'total_votes': question.vote_count()})
+
+
+@login_required
+def vote_answer(request):
+    answer_id = request.POST.get('answer_id')
+    value = request.POST.get('value')
+    user_id = request.POST.get('user_id')
+
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+        user = User.objects.get(pk=user_id)
+    except (User.DoesNotExist, Answer.DoesNotExist) as e:
+        return HttpResponse(0)
+
+    try:
+        answer_vote = AnswerVote.objects.get(answer_id=answer_id, user_id=user.id)
+    except AnswerVote.DoesNotExist:
+        answer_vote = AnswerVote()
+        answer_vote.answer = answer
+        answer_vote.user = user
+        answer_vote.value = 0
+
+    if answer_vote.value == int(value):
+        answer_vote.value = 0
+    else:
+        answer_vote.value = int(value)
+
+    answer_vote.save()
+
+    return JsonResponse({'current_vote': answer_vote.value, 'total_votes': answer.vote_count()})
 
 
 def signup_view(request):

@@ -15,5 +15,5 @@ class SignUpForm(UserCreationForm):
 
 
 class AddQuestionForm(forms.Form):
-    header = forms.CharField(label='Title', max_length=256, required=True)
+    title = forms.CharField(label='Title', max_length=256, required=True)
     content = forms.CharField(label='Text', max_length=4096, required=True)
