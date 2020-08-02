@@ -36,6 +36,41 @@
             },
         });
     }
+
+    function onClickUpVoteAnswer(id) {
+        vote_ans(id, 1)
+    }
+
+	function onClickDownVoteAnswer(id) {
+        vote_ans(id, -1)
+    }
+
+	function vote_ans(id, vote_value) {
+        $.ajax({
+            url: '{% url 'vote_answer' %}',
+            type: 'POST',
+            data:{answer_id: id, value: vote_value, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(response) {
+                current_vote = response.current_vote
+                if (current_vote == -1) {
+                    document.getElementById("down-vote-answer-" + id).style.color = "orange";
+                    document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
+                } else if (current_vote == 1) {
+                    document.getElementById("up-vote-answer-" + id).style.color = "orange";
+                    document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
+                } else if (current_vote == 0) {
+                    if (vote_value == 1) {
+                        document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
+                    } else {
+                        document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
+                    }
+                }
+
+                document.getElementById("answer-vote-" + id).innerHTML = response.total_votes
+            },
+        });
+
+    }
 </script>
 {% endblock %}
 
@@ -56,8 +91,19 @@
    </div>
 </div>
 
+
+{% load homepage_filters %}
 {% for answer in question.answer_set.all %}
-    <li>{{ answer.content }}</li>
+<div class="row">
+    <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
+        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="color:{% if answer|get_current_user_vote:user.id == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
+        <div id="answer-vote-{{ answer.id }}">{{ answer.vote_count }}</div>
+        <div class="fa fa-caret-down" id="down-vote-answer-{{ answer.id }}" style="color:{% if answer|get_current_user_vote:user.id == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
+    </div>
+    <div class="col-md-2">
+        {{ answer.content }}
+    </div>
+</div>
 {% endfor %}
 
 <br>
