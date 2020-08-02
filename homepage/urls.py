@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^signup$', views.signup_view, name='signup'),
     url(r'^settings$', views.settings_view, name='settings'),
     url(r'^search$', views.SearchResultsView.as_view(), name='search_results'),
+    url(r'^ajax/vote/question/$', views.vote_question, name='vote_question'),
 ]

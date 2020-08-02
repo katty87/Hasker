@@ -1,29 +1,57 @@
 {% extends "base_generic.html" %}
 
 {% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script>
-	var state = 0;
-
 	function onClickUpVote() {
-		if ({{ question.current_user_vote }} == 1) {
-  			document.getElementById("up-vote").style.color = "orange";
-  		} else {
-  			document.getElementById("up-vote").style.color = "#D3D3D3";
-  		}
-}
+	    alert('onClickUpVote');
+
+        $.ajax({
+            url: '{% url 'vote_question' %}',
+            type: 'POST',
+            data:{question_id: {{ question.id }}, value: 1, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(response) {
+                alert(response);
+                if (response == 1) {
+                    document.getElementById("up-vote").style.color = "orange";
+                    document.getElementById("down-vote").style.color = "#D3D3D3";
+                } else {
+                    document.getElementById("up-vote").style.color = "#D3D3D3";
+                }
+            },
+        });
+    }
+
+	function onClickDownVote() {
+	    alert('onClickDownVote');
+
+        $.ajax({
+            url: '{% url 'vote_question' %}',
+            type: 'POST',
+            data:{question_id: {{ question.id }}, value: -1, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(response) {
+                alert(response);
+                if (response == -1) {
+                    document.getElementById("down-vote").style.color = "orange";
+                    document.getElementById("up-vote").style.color = "#D3D3D3";
+                } else {
+                    document.getElementById("down-vote").style.color = "#D3D3D3";
+                }
+            },
+        });
+    }
 </script>
 {% endblock %}
 
 {% block content %}
 
 <div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
-
 <div class="row">
   <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
 
      <div class="fa fa-caret-up" id="up-vote" style="color:#D3D3D3;font-size:36px" onclick="onClickUpVote()"></div>
      <div>{{ question.vote_count }}</div>
-     <div class="fa fa-caret-down" style="color:#D3D3D3;font-size:36px" onclick="onClickDownVote()"></div>
+     <div class="fa fa-caret-down" id="down-vote" style="color:#D3D3D3;font-size:36px" onclick="onClickDownVote()"></div>
 
    </div>
    <div class="col-md-2">
@@ -38,7 +66,7 @@
 
 <br>
 <br>
-
+{% if user.is_authenticated %}
 <form action="{% url 'answer_question' question.id %}" method="post">
     {% csrf_token %}
     <div class="form-group">
@@ -50,6 +78,16 @@
         <input type="submit" class="btn btn-primary" value="Post your answer"/>
     </div>
 
+
 </form>
+{% else %}
+
+<span>Log in or sign up to post an answer</span>
+<span align="right">
+    <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
+    <a class="btn btn-outline-primary">Sign Up</a>
+</span>
+
+{% endif %}
 
 {% endblock %}

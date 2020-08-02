@@ -50,6 +50,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_USE_SESSIONS = True
+
 ROOT_URLCONF = 'Hasker.urls'
 
 LOGIN_REDIRECT_URL = '/'
