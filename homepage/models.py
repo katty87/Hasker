@@ -3,11 +3,16 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Sum
+import os
+
+
+def get_image_path(instance, filename):
+    return os.path.join('profile_images', "{}".format(instance.id), filename)
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(null=True)
+    avatar = models.ImageField(null=True, upload_to=get_image_path)
 
 
 class Tag(models.Model):

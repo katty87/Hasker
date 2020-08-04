@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -13,7 +14,7 @@ from django.http import JsonResponse
 import json
 
 from homepage.forms import SignUpForm, AddQuestionForm
-from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag
+from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
 
 
 class IndexView(generic.ListView):
@@ -163,13 +164,20 @@ def vote_answer(request):
 
 def signup_view(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            new_user = form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
+
+            image_field = form.cleaned_data['avatar']
+            user_profile = new_user.userprofile
+
+            user_profile.avatar = image_field
+            user_profile.save()
+
+            # user = authenticate(username=username, password=raw_password)
+            login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
             return redirect('index')
     else:
         form = SignUpForm()
