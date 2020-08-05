@@ -3,15 +3,15 @@ import os
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.template import loader
 from django.db.models import Q
 from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
@@ -170,10 +170,9 @@ def signup_view(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
 
-            image_field = form.cleaned_data['avatar']
             user_profile = new_user.userprofile
 
-            user_profile.avatar = image_field
+            user_profile.avatar = form.cleaned_data['avatar']
             user_profile.save()
 
             # user = authenticate(username=username, password=raw_password)
@@ -184,6 +183,24 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 
-def settings_view(request):
-    return HttpResponse("Settings")
+class SettingsView(LoginRequiredMixin, UpdateView):
+    model = User
+    template_name = 'registration/user_settings.html'
+    fields = ['email']
 
+    def get_success_url(self):
+        redirect_to = self.request.POST['next']
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        context = super(SettingsView, self).get_context_data(**kwargs)
+        context.update({'next': self.request.GET.get('next', '')})
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        response = super(SettingsView, self).post(request, *args, **kwargs)
+        form = self.get_form()
+        request.user.userprofile.avatar = form.files['avatar']
+        request.user.userprofile.save()
+        return response
