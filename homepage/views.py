@@ -184,9 +184,9 @@ def signup_view(request):
 
 
 class SettingsView(LoginRequiredMixin, UpdateView):
-    model = User
+    model = UserProfile
     template_name = 'registration/user_settings.html'
-    fields = ['email']
+    fields = ['avatar']
 
     def get_success_url(self):
         redirect_to = self.request.POST['next']
@@ -195,12 +195,13 @@ class SettingsView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(SettingsView, self).get_context_data(**kwargs)
         context.update({'next': self.request.GET.get('next', '')})
+        context.update({'file_name': os.path.basename(self.request.user.userprofile.avatar.name)})
 
         return context
 
     def post(self, request, *args, **kwargs):
         response = super(SettingsView, self).post(request, *args, **kwargs)
         form = self.get_form()
-        request.user.userprofile.avatar = form.files['avatar']
-        request.user.userprofile.save()
+        request.user.email = form.data['email']
+        request.user.save()
         return response

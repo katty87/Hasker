@@ -20,10 +20,13 @@
     <div class="form-group row">
         <label for="avatar" class="col-sm-2 col-form-label">Avatar</label>
         <div class="col-sm-10">
-            <img src="{{ user.userprofile.avatar.url }}" width="100" height="100" alt="No image">
+            <img src="{{ user.userprofile.avatar.url }}" id="img-preview" width="100" height="100" alt="No image">
 
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="avatar" name="avatar" accept="image/*" value="{{ user.userprofile.avatar.url }}" onchange="loadFile(event)">
+              <label class="custom-file-label" for="avatar" id="file_name">{{ file_name }}</label>
+            </div>
         </div>
-        <input type="file" class="form-control" id="avatar" name="avatar" value="/media/profile_images/1/sql.png">
     </div>
 
   <div class="form-group row">
@@ -34,4 +37,15 @@
   </div>
 </form>
 </form>
+
+<script>
+  var loadFile = function(event) {
+    var preview = document.getElementById('img-preview');
+    preview.src = URL.createObjectURL(event.target.files[0]);
+    preview.onload = function() {
+      URL.revokeObjectURL(preview.src)
+    }
+    document.getElementById('file_name').innerHTML = event.target.files[0].name
+  };
+</script>
 {% endblock %}
