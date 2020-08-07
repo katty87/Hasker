@@ -3,15 +3,19 @@ import os
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
 from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.views import generic
 from django.http import JsonResponse
+from django.core.mail import send_mail
 import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from Hasker.settings import EMAIL_HOST_USER
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
@@ -90,6 +94,7 @@ class QuestionDetailView(generic.DetailView):
 
 
 @login_required
+@require_http_methods(['POST'])
 def answer_question(request, pk):
     question = get_object_or_404(Question, pk=pk)
 
@@ -99,6 +104,20 @@ def answer_question(request, pk):
     answer.is_correct = False
     answer.user = request.user
     answer.save()
+
+    send_mail(
+        'Hasker: new answer to your question',
+        '',
+        EMAIL_HOST_USER,
+        [question.user.email],
+        fail_silently=True,
+        html_message=
+        '<!DOCTYPE html><html><body>You have got a new answer to your question.\n '
+        'If you would like to see it please click '
+        '<a href="{full_url}">{full_url}</a>'
+        '</body></html>'.format(full_url=request.META['HTTP_REFERER'])
+    )
+
     return redirect('question_detail', pk=question.id)
 
 

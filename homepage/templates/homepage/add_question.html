@@ -1,40 +1,6 @@
 {% extends "base_generic.html" %}
 {% load static %}
 
-{% block scripts %}
-  <link href='{% static "homepage/css/jquery.tagit.css" %}' rel="stylesheet" type="text/css">
-  <link href='{% static "homepage/css/tagit.ui-zendesk.css" %}' rel="stylesheet" type="text/css">
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-
-  <script src='{% static "homepage/js/tag-it.js" %}' type="text/javascript" charset="utf-8"></script>
-
-
-  <script>
-      var all_tags = {{ tags|safe }};
-
-      $(function(){
-
-          var sampleTags = all_tags;
-
-          var eventTags = $('#eventTags');
-
-          var addEvent = function(text) {
-              $('#events_container').append(text + '<br>');
-          };
-
-          eventTags.tagit({
-              availableTags: sampleTags,
-              singleField: true,
-              tagLimit: 3,
-              caseSensitive: false,
-          });
-
-      });
-  </script>
-{% endblock %}
-
 {% block content %}
 
   <h2>Ask a question</h2>
@@ -69,4 +35,38 @@
   </form>
 
   </form>
+{% endblock %}
+
+{% block scripts %}
+  <link href='{% static "homepage/css/jquery.tagit.css" %}' rel="stylesheet" type="text/css">
+  <link href='{% static "homepage/css/tagit.ui-zendesk.css" %}' rel="stylesheet" type="text/css">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src='{% static "homepage/js/tag-it.js" %}' type="text/javascript"></script>
+
+
+  <script>
+      var all_tags = {{ tags|safe }};
+
+      $(function(){
+
+          var sampleTags = all_tags;
+
+          var eventTags = $('#eventTags');
+
+          var addEvent = function(text) {
+              $('#events_container').append(text + '<br>');
+          };
+
+          eventTags.tagit({
+              availableTags: sampleTags,
+              singleField: true,
+              tagLimit: 3,
+              caseSensitive: false,
+          });
+
+      });
+  </script>
 {% endblock %}

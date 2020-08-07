@@ -9,7 +9,6 @@ from homepage.models import UserProfile
 
 
 class SignUpForm(UserCreationForm):
-    # birth_date = forms.DateField(help_text='Required. Format: YYYY-MM-DD')
     avatar = forms.ImageField(help_text='Load picture', required=False)
 
     class Meta:

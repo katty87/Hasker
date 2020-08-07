@@ -1,12 +1,72 @@
 {% extends "base_generic.html" %}
-
 {% load static %}
+
+{% block content %}
+
+<div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
+<div class="row">
+  <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
+
+     <div class="fa fa-caret-up" id="up-vote" style="cursor: pointer;color:{% if question_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVote()"></div>
+     <div id="question-vote">{{ question.vote_count }}</div>
+     <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVote()"></div>
+
+   </div>
+   <div class="col-md-2">
+
+        {{ question.content }}
+   </div>
+</div>
+
+
+{% load homepage_filters %}
+{% for answer in question.answer_set.all %}
+<div class="row">
+    <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
+        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
+        <div id="answer-vote-{{ answer.id }}">{{ answer.vote_count }}</div>
+        <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
+        <p style="{% if user.id == question.user.id %} cursor:pointer;color:black{% else %}cursor:default;color:#D3D3D3{% endif %};font-size:20px" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
+    </div>
+    <div class="col-md-2">
+        {{ answer.content }}
+    </div>
+</div>
+{% endfor %}
+
+<br>
+<br>
+{% if user.is_authenticated %}
+<form action="{% url 'answer_question' question.id %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="answer">Your answer</label>
+        <textarea class="form-control" name="answer_text" id="answer" rows="3"></textarea>
+    </div>
+
+    <div class="button">
+        <input type="submit" class="btn btn-primary" value="Post your answer"/>
+    </div>
+
+
+</form>
+{% else %}
+
+<span>Log in or sign up to post an answer</span>
+<span align="right">
+    <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
+    <a class="btn btn-outline-primary">Sign Up</a>
+</span>
+
+{% endif %}
+
+{% endblock %}
 
 {% block scripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <script>
-    	function onClickUpVote() {
+    function onClickUpVote() {
         vote(1)
     }
 
@@ -98,66 +158,5 @@
 
     }
 </script>
-
-{% endblock %}
-
-{% block content %}
-
-<div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
-<div class="row">
-  <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-
-     <div class="fa fa-caret-up" id="up-vote" style="cursor: pointer;color:{% if question_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVote()"></div>
-     <div id="question-vote">{{ question.vote_count }}</div>
-     <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVote()"></div>
-
-   </div>
-   <div class="col-md-2">
-
-        {{ question.content }}
-   </div>
-</div>
-
-
-{% load homepage_filters %}
-{% for answer in question.answer_set.all %}
-<div class="row">
-    <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
-        <div id="answer-vote-{{ answer.id }}">{{ answer.vote_count }}</div>
-        <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
-        <p style="{% if user.id == question.user.id %} cursor:pointer;color:black{% else %}cursor:default;color:#D3D3D3{% endif %};font-size:20px" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
-    </div>
-    <div class="col-md-2">
-        {{ answer.content }}
-    </div>
-</div>
-{% endfor %}
-
-<br>
-<br>
-{% if user.is_authenticated %}
-<form action="{% url 'answer_question' question.id %}" method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="answer">Your answer</label>
-        <textarea class="form-control" name="answer_text" id="answer" rows="3"></textarea>
-    </div>
-
-    <div class="button">
-        <input type="submit" class="btn btn-primary" value="Post your answer"/>
-    </div>
-
-
-</form>
-{% else %}
-
-<span>Log in or sign up to post an answer</span>
-<span align="right">
-    <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
-    <a class="btn btn-outline-primary">Sign Up</a>
-</span>
-
-{% endif %}
 
 {% endblock %}
