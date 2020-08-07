@@ -162,20 +162,35 @@ def vote_answer(request):
     return JsonResponse({'current_vote': answer_vote.value, 'total_votes': answer.vote_count()})
 
 
+@login_required
+def mark_answer_right(request):
+    answer_id = request.POST.get('answer_id')
+    user_id = request.POST.get('user_id')
+
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except (User.DoesNotExist, Answer.DoesNotExist) as e:
+        return HttpResponse(-1)
+
+    if answer.question.user.id != int(user_id):
+        return HttpResponse(-1)
+
+    value = 0 if answer.is_correct == 1 else 1
+    answer.is_correct = value
+    answer.save()
+
+    return HttpResponse(value)
+
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             new_user = form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-
             user_profile = new_user.userprofile
-
             user_profile.avatar = form.cleaned_data['avatar']
             user_profile.save()
 
-            # user = authenticate(username=username, password=raw_password)
             login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
             return redirect('index')
     else:
