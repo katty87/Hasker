@@ -11,14 +11,17 @@ from homepage.models import UserProfile
 
 
 class SignUpForm(UserCreationForm):
-    avatar = forms.ImageField(help_text='Load picture up to 1MB', required=True)
+    avatar = forms.ImageField(help_text='Load picture up to 1MB', required=False)
+    avatar_file = None
+    _f = ''
 
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2', 'email')
 
     def clean_avatar(self):
-        avatar = self.cleaned_data.get('avatar', False)
+        avatar = self.cleaned_data.get('avatar', None)
+
         if avatar:
             if avatar.size > 1 * 1024 * 1024:
                 raise ValidationError("Avatar picture too big ( > 1mb )")
@@ -28,9 +31,7 @@ class SignUpForm(UserCreationForm):
             if width < 100 or height < 100:
                 raise ValidationError("Avatar picture must be at least 100x100 pixels")
 
-            return avatar
-        else:
-            raise ValidationError("Couldn't read uploaded image")
+        return avatar
 
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)

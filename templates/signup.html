@@ -3,20 +3,83 @@
 {% block content %}
   <h2>Sign up</h2>
 
-  <form method="post" enctype="multipart/form-data">
+  <form class="form" enctype="multipart/form-data" method="post">
     {% csrf_token %}
-    {% for field in form %}
-      <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: grey">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-      </p>
-    {% endfor %}
-    <button type="submit">Sign up</button>
+    {{ form.non_field_errors }}
+    <div class="form-group row">
+      <label for="username" class="col-sm-2 col-form-label">Login</label>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" id="username" name="username" value="{{ form.username.value|default_if_none:'' }}">
+        <p style="color: red">{{ form.username.errors.as_text }}</p>
+      </div>
+      <div class="col-sm-5">
+        <small style="color: grey">{{ form.username.help_text }}</small>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="email" class="col-sm-2 col-form-label">Email</label>
+      <div class="col-sm-4">
+        <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value|default_if_none:'' }}" placeholder="Email">
+        <p style="color: red">{{ form.username.errors.as_text }}</p>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="password1" class="col-sm-2 col-form-label">Password</label>
+      <div class="col-sm-4">
+        <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
+        <p style="color: red">{{ form.password1.errors.as_text }}</p>
+        <small style="color: grey">{{ form.password1.help_text }}</small>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="password1" class="col-sm-2 col-form-label">Repeat password</label>
+      <div class="col-sm-4">
+        <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
+        <p style="color: red">{{ form.password2.errors.as_text }}</p>
+      </div>
+      <div class="col-sm-5">
+        <small style="color: grey">{{ form.password2.help_text }}</small>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="avatar" class="col-sm-2 col-form-label">Avatar</label>
+        <div class="col-sm-4">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="avatar" name="avatar" accept="image/*"  onchange="loadFile(event)">
+              <label class="custom-file-label" for="avatar" id="file_name" data-browse="Upload" onclick="onFileClick()">{{ file_name|default_if_none:'Select file...' }}</label>
+              <p style="color: red">{{ form.avatar.errors.as_text }}</p>
+            </div>
+        </div>
+        <div class="col-sm-5">
+          <small style="color: grey">{{ form.avatar.help_text }}</small>
+        </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-4">
+          <button type="submit" class="btn btn-primary">Sign up</button>
+          <input type="hidden" name="next" value="{{ next }}">
+      </div>
+    </div>
   </form>
+
 {% endblock %}
+
+{% block scripts %}
+<script>
+  var files
+  var loadFile = function(event) {
+    if (event.target.files.length > 0) {
+        document.getElementById('file_name').innerHTML = event.target.files[0].name
+    }
+  };
+
+  function onFileClick(){
+    alert(1)
+  }
+</script>
+{% endblock %}
+

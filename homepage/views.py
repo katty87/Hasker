@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
+from django.contrib.auth.forms import UserCreationForm
+
 from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -16,6 +18,7 @@ import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from Hasker.settings import EMAIL_HOST_USER
+from django.core.files.storage import default_storage
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
@@ -202,9 +205,23 @@ def mark_answer_right(request):
     return HttpResponse(value)
 
 
-def signup_view(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST, request.FILES)
+class SignUpView(generic.CreateView):
+    form_class = SignUpForm
+    template_name = "signup.html"
+
+    def get_success_url(self):
+        redirect_to = self.request.POST['next']
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        context = super(SignUpView, self).get_context_data(**kwargs)
+        context.update({'next': self.request.GET.get('next', '')})
+        return context
+
+    def post(self, request, *args, **kwargs):
+        response = super(SignUpView, self).post(request, *args, **kwargs)
+        form = self.get_form()
+
         if form.is_valid():
             new_user = form.save()
             user_profile = new_user.userprofile
@@ -212,10 +229,50 @@ def signup_view(request):
             user_profile.save()
 
             login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
-            return redirect('index')
+        return response
+
+
+"""
+def signup_view(request):
+
+    context = {
+    }
+
+    if request.method == 'POST':
+        form = SignUpForm(request.POST, request.FILES)
+        context.update({'next': request.POST.get('next', '')})
+        context.update({'file_name': request.FILES.get('avatar', '')})
+        context.update({'avatar': request.FILES.get('avatar', '')})
+
+        avatar_file = request.FILES.get('avatar', None)
+        if avatar_file:
+            form.avatar_file = avatar_file
+
+        if form.is_valid():
+            new_user = form.save()
+            user_profile = new_user.userprofile
+            user_profile.avatar = form.cleaned_data['avatar']
+            user_profile.save()
+
+            login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
+
+            redirect_to = request.POST['next']
+            if not redirect_to:
+                redirect_to = 'index'
+            return redirect(redirect_to)
+        else:
+            if request.FILES and request.FILES.get('avatar', None):
+                file = request.FILES.get('avatar', None)
+                file_name = default_storage.save(file.name, file)
+                context.update({'file_name': file_name})
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+        context.update({'next': request.GET.get('next', '')})
+
+    context.update({'form': form})
+
+    return render(request, 'signup.html', context)
+"""
 
 
 class SettingsView(LoginRequiredMixin, UpdateView):
