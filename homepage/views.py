@@ -232,49 +232,6 @@ class SignUpView(generic.CreateView):
         return response
 
 
-"""
-def signup_view(request):
-
-    context = {
-    }
-
-    if request.method == 'POST':
-        form = SignUpForm(request.POST, request.FILES)
-        context.update({'next': request.POST.get('next', '')})
-        context.update({'file_name': request.FILES.get('avatar', '')})
-        context.update({'avatar': request.FILES.get('avatar', '')})
-
-        avatar_file = request.FILES.get('avatar', None)
-        if avatar_file:
-            form.avatar_file = avatar_file
-
-        if form.is_valid():
-            new_user = form.save()
-            user_profile = new_user.userprofile
-            user_profile.avatar = form.cleaned_data['avatar']
-            user_profile.save()
-
-            login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
-
-            redirect_to = request.POST['next']
-            if not redirect_to:
-                redirect_to = 'index'
-            return redirect(redirect_to)
-        else:
-            if request.FILES and request.FILES.get('avatar', None):
-                file = request.FILES.get('avatar', None)
-                file_name = default_storage.save(file.name, file)
-                context.update({'file_name': file_name})
-    else:
-        form = SignUpForm()
-        context.update({'next': request.GET.get('next', '')})
-
-    context.update({'form': form})
-
-    return render(request, 'signup.html', context)
-"""
-
-
 class SettingsView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     template_name = 'registration/user_settings.html'
