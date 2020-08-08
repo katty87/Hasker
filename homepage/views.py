@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from django.views.generic import ListView
 
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.functions import Coalesce
 
 from django.contrib.auth import login
@@ -22,6 +22,8 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from Hasker.settings import EMAIL_HOST_USER, MEDIA_URL
 from django.core.files.storage import default_storage
+from django.utils import timezone
+
 
 from homepage.forms import SignUpForm, AddQuestionForm
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
@@ -32,7 +34,15 @@ class IndexView(generic.ListView):
     context_object_name = 'question_list'
 
     def get_queryset(self):
-        return Question.objects.all()
+        return Question.objects.all().\
+            annotate(answer_cnt=Count('answer', distinct=True), vote_sum=Count('questionvote', distinct=True)).\
+            values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar', 'answer_cnt', 'vote_sum')
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context.update({'media_url': MEDIA_URL})
+
+        return context
 
 
 class SearchResultsView(generic.ListView):
@@ -45,6 +55,8 @@ class SearchResultsView(generic.ListView):
         return Question.objects.filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
 
 
+
+
 @login_required
 def ask_view(request):
     question_instance = Question()
@@ -54,7 +66,7 @@ def ask_view(request):
         if form.is_valid():
             question_instance.header = form.cleaned_data['title']
             question_instance.content = form.cleaned_data['content']
-            question_instance.create_date = datetime.now()
+            question_instance.create_date = datetime.utcnow()
             question_instance.user = request.user
             question_instance.save()
 
@@ -122,7 +134,7 @@ def answer_question(request, pk):
     answer = Answer()
     answer.content = request.POST['answer_text']
     answer.question = question
-    answer.create_date = datetime.now()
+    answer.create_date = datetime.utcnow()
     answer.is_correct = False
     answer.user = request.user
     answer.save()
