@@ -12,9 +12,10 @@
      <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVote()"></div>
 
    </div>
-   <div class="col-md-2">
-
-        {{ question.content }}
+   <div class="col-md-10">
+    <p>
+        {{ question.content|linebreaks }}
+    </p>
    </div>
 </div>
 

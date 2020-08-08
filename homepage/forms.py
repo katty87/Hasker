@@ -5,16 +5,32 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 
 from homepage.models import UserProfile
 
 
 class SignUpForm(UserCreationForm):
-    avatar = forms.ImageField(help_text='Load picture', required=False)
+    avatar = forms.ImageField(help_text='Load picture up to 1MB', required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2',)
+        fields = ('username', 'password1', 'password2', 'email')
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar', False)
+        if avatar:
+            if avatar.size > 1 * 1024 * 1024:
+                raise ValidationError("Avatar picture too big ( > 1mb )")
+
+            width, height = get_image_dimensions(avatar.file)
+
+            if width < 100 or height < 100:
+                raise ValidationError("Avatar picture must be at least 100x100 pixels")
+
+            return avatar
+        else:
+            raise ValidationError("Couldn't read uploaded image")
 
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
@@ -50,8 +66,8 @@ class AddQuestionForm(forms.Form):
     def clean_content(self):
         content = self.cleaned_data['content']
 
-        if len(content) < 250:
-            raise ValidationError('Please enter at least 250 characters')
+        if len(content) < 100:
+            raise ValidationError('Please enter at least 100 characters')
 
         return content
 
