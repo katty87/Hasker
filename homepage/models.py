@@ -53,10 +53,6 @@ class Answer(models.Model):
     create_date = models.DateTimeField()
     is_correct = models.BooleanField()
 
-    def vote_count(self):
-        cnt = AnswerVote.objects.filter(answer_id=self.id).aggregate(Sum('value')).get('value__sum')
-        return cnt if cnt else 0
-
     def current_user_vote(self, user_id):
         try:
             answer_vote = AnswerVote.objects.get(answer_id=self.id, user_id=user_id)

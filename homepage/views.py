@@ -5,7 +5,10 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import ListView
+
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,7 +20,7 @@ from django.core.mail import send_mail
 import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from Hasker.settings import EMAIL_HOST_USER
+from Hasker.settings import EMAIL_HOST_USER, MEDIA_URL
 from django.core.files.storage import default_storage
 
 from homepage.forms import SignUpForm, AddQuestionForm
@@ -80,9 +83,17 @@ def ask_view(request):
     return render(request, 'homepage/add_question.html', context)
 
 
-class QuestionDetailView(generic.DetailView):
-    model = Question
+class QuestionDetailView(ListView):
+    model = Answer
     template_name = 'homepage/detail_question.html'
+    context_object_name = 'answer_list'
+    paginate_by = 30
+
+    def get_queryset(self):
+        return Answer.objects.filter(question_id=self.kwargs['pk']).\
+            annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)). \
+            order_by('-vote_sum', 'create_date').values('id', 'content', 'user__username', 'user__userprofile__avatar',
+                                                        'vote_sum')
 
     def get_context_data(self, **kwargs):
         if not self.request.user:
@@ -90,8 +101,15 @@ class QuestionDetailView(generic.DetailView):
 
         user_id = self.request.user.id
         context = super(QuestionDetailView, self).get_context_data(**kwargs)
-        question = self.get_object()
-        context.update({'question_vote': question.current_user_vote(user_id)})
+
+        pk = self.kwargs.get('pk', '')
+
+        if pk:
+            question = get_object_or_404(Question, pk=pk)
+            context.update({'question_vote': question.current_user_vote(user_id)})
+            context.update({'question': question})
+
+        context.update({'media_url': MEDIA_URL})
 
         return context
 

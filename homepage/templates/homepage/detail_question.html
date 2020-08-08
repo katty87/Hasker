@@ -28,24 +28,53 @@
 <hr>
 
 {% load homepage_filters %}
-{% for answer in question.answer_set.all %}
+{% for answer in answer_list %}
 <div class="row">
     <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
         <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
-        <div id="answer-vote-{{ answer.id }}">{{ answer.vote_count }}</div>
+        <div id="answer-vote-{{ answer.id }}">{{ answer.vote_sum }}</div>
         <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
         <p style="{% if user.id == question.user.id %} cursor:pointer;color:black{% else %}cursor:default;color:#D3D3D3{% endif %};font-size:20px" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
     </div>
     <div class="col-md-10">
         <p>{{ answer.content|linebreaks  }}</p>
         <div align="right">
-            <img src="{{ answer.user.userprofile.avatar.url }}" width="50" height="50" class="right"  alt="no image">
-           <div style="float:right;width:75px;text-align: left;">    {{ answer.user.username }}</div>
+            <img src="{{ media_url }}{{ answer.user__userprofile__avatar }}" width="50" height="50" class="right"  alt="no image">
+           <div style="float:right;width:75px;text-align: left;">    {{ answer.user__username }}</div>
         </div>
     </div>
 </div>
 <hr>
 {% endfor %}
+
+
+<nav aria-label="...">
+  <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">Prev</a>
+        </li>
+      {% endif %}
+
+      {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{i}}">{{ i }} <span class="sr-only">(current)</span></a>
+            </li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+          {% endif %}
+
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+      {% endif %}
+
+  </ul>
+</nav>
 
 <br>
 <br>
