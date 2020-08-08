@@ -20,7 +20,7 @@
 
         {% if user.is_authenticated %}
             <div align="right">
-                <a class="btn btn-link" href="{% url 'settings' user.id %}?next={{request.path}}">{{ user.username }}</a>
+                <a class="btn btn-link" href="{% url 'settings' user.userprofile.id %}?next={{request.path}}">{{ user.username }}</a>
                 <a class="btn btn-outline-primary" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
             </div>
         {% else %}

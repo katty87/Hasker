@@ -50,7 +50,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.CharField(max_length=4096)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answer_author')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answer_author')
+    create_date = models.DateTimeField()
     is_correct = models.BooleanField()
 
     def vote_count(self):

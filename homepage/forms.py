@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 from homepage.models import UserProfile
 
@@ -37,3 +38,22 @@ def save_user_profile(sender, instance, **kwargs):
 class AddQuestionForm(forms.Form):
     title = forms.CharField(label='Title', max_length=256, required=True)
     content = forms.CharField(label='Text', max_length=4096, required=True)
+
+    error_css_class = 'error'
+    required_css_class = 'required'
+
+    def __init__(self, *args, **kwargs):
+        super(AddQuestionForm, self).__init__(*args, **kwargs)
+        self.fields['title'].error_messages = {'required': 'Title is missing.'}
+        self.fields['content'].error_messages = {'required': 'Body is missing.'}
+
+    def clean_content(self):
+        content = self.cleaned_data['content']
+
+        if len(content) < 250:
+            raise ValidationError('Please enter at least 250 characters')
+
+        return content
+
+
+

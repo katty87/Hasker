@@ -101,6 +101,7 @@ def answer_question(request, pk):
     answer = Answer()
     answer.content = request.POST['answer_text']
     answer.question = question
+    answer.create_date = datetime.now()
     answer.is_correct = False
     answer.user = request.user
     answer.save()
@@ -229,7 +230,10 @@ class SettingsView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(SettingsView, self).get_context_data(**kwargs)
         context.update({'next': self.request.GET.get('next', '')})
-        context.update({'file_name': os.path.basename(self.request.user.userprofile.avatar.name)})
+        if self.request.user.userprofile.avatar:
+            context.update({'file_name': os.path.basename(self.request.user.userprofile.avatar.name)})
+        else:
+            context.update({'file_name': ''})
 
         return context
 

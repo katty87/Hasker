@@ -5,26 +5,29 @@
 
   <h2>Ask a question</h2>
   <br>
-  <form method="post">
+  <form class="form" method="post">
     {% csrf_token %}
-
+    {{ form.non_field_errors }}
     <div class="form-group row">
       <label for="title" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" id="title" name="title">
+        {{ form.title.errors }}
       </div>
     </div>
 
     <div class="form-group row">
       <label for="content" class="col-sm-2 col-form-label">Text</label>
       <div class="col-sm-10">
-        <textarea class="form-control" id="content" name="content" rows="3"></textarea>
+        <textarea class="form-control" id="content" name="content" rows="3">{{ answer }}</textarea>
+        {{ form.content.errors }}
       </div>
     </div>
       <div class="form-group row">
         <label for="eventTags" class="col-sm-2 col-form-label">Tags</label>
         <div class="col-sm-10">
-          <ul id="eventTags"></ul>
+          <ul id="eventTags"  name="event_tags"></ul>
+          <small id="tagHelp" class="form-text text-muted">Please enter no more than 3 tags.</small>
         </div>
       </div>
     <div class="form-group row">
@@ -63,8 +66,8 @@
           eventTags.tagit({
               availableTags: sampleTags,
               singleField: true,
-              tagLimit: 3,
               caseSensitive: false,
+              tagLimit: 3,
           });
 
       });
