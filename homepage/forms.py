@@ -90,6 +90,7 @@ class UserSettings(forms.ModelForm):
 
     class Meta:
         model = UserProfile
+        fields = ('avatar',)
 
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar', None)
