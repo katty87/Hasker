@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from django.views.generic import ListView
 
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, When, Case
 from django.db.models.functions import Coalesce
 
 from django.contrib.auth import login
@@ -21,8 +21,6 @@ import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from Hasker.settings import EMAIL_HOST_USER, MEDIA_URL
-from django.core.files.storage import default_storage
-from django.utils import timezone
 
 
 from homepage.forms import SignUpForm, AddQuestionForm
@@ -32,17 +30,28 @@ from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, Use
 class IndexView(generic.ListView):
     template_name = 'homepage/index.html'
     context_object_name = 'question_list'
+    paginate_by = 20
 
     def get_queryset(self):
-        return Question.objects.all().\
-            annotate(answer_cnt=Count('answer', distinct=True), vote_sum=Count('questionvote', distinct=True)).\
-            values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar', 'answer_cnt', 'vote_sum')
+        order_by = ['-vote_sum', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
+            else ['-create_date', '-vote_sum']
+
+        return Question.objects.all() \
+            .annotate(answer_cnt=Count('answer', distinct=True), vote_sum=Count('questionvote', distinct=True)) \
+            .order_by(*order_by) \
+            .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
+                    'answer_cnt', 'vote_sum')
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context.update({'media_url': MEDIA_URL})
+        context.update({'ordering': self.request.GET.get('ordering', '0')})
 
         return context
+
+    def get(self, request, *args, **kwargs):
+        response = super(IndexView, self).get(request, *args, **kwargs)
+        return response
 
 
 class SearchResultsView(generic.ListView):
@@ -53,8 +62,6 @@ class SearchResultsView(generic.ListView):
     def get_queryset(self):
         search_string = self.request.GET.get('q')
         return Question.objects.filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
-
-
 
 
 @login_required
@@ -102,10 +109,17 @@ class QuestionDetailView(ListView):
     paginate_by = 30
 
     def get_queryset(self):
-        return Answer.objects.filter(question_id=self.kwargs['pk']).\
-            annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)). \
-            order_by('-vote_sum', 'create_date').values('id', 'content', 'user__username', 'user__userprofile__avatar',
-                                                        'vote_sum')
+        if self.request.user:
+            user_id = self.request.user.id
+        else:
+            user_id = -1
+
+        return Answer.objects.filter(question_id=self.kwargs['pk']) \
+            .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0),
+                      current_user_vote=Sum(
+                          Case(When(answervote__user_id=user_id, then='answervote__value'), default=0))) \
+            .order_by('-vote_sum', 'create_date').values('id', 'content', 'user__username', 'user__userprofile__avatar',
+                                                         'vote_sum', 'current_user_vote')
 
     def get_context_data(self, **kwargs):
         if not self.request.user:

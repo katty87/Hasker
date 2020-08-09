@@ -11,14 +11,20 @@
 <body>
 
     <nav class="navbar navbar-light bg-light">
-       <a class="navbar-brand" href="{% url 'index' %}">
-           <h1>Hasker</h1>
-       </a>
-        <form class="form-inline" action="{% url 'search_results' %}" method="get">
-            <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
 
+        <div>
+            <img src="{{ media_url }}logo.png" width="50" height="50">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <h1>Hasker</h1>
+            </a>
+        </div>
+
+        <form class="inline-form" action="{% url 'search_results' %}" method="get">
+            <div class="input-group">
+                <input class="form-control" name="q" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </div>
+        </form>
         {% if user.is_authenticated %}
             <div align="right">
                 <img src="{{ user.userprofile.avatar.url }}" width="25" height="25">
@@ -31,6 +37,7 @@
                 <a class="btn btn-outline-primary" href="{% url 'signup'%}?next={{request.path}}">Sign Up</a>
             </div>
         {% endif %}
+
     </nav>
     <br>
     <div class="container-fluid">

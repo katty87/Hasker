@@ -3,65 +3,81 @@
 {% block content %}
 
 <div class="container">
-  <!-- Nav pills -->
-  <ul class="nav nav-pills" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link active" data-toggle="pill" href="#new_questions"><h3>New questions</h3></a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="pill" href="#hot_questions"><h3>Hot questions</h3></a>
-    </li>
-  </ul>
 
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <div id="new_question" class="container tab-pane active"><br>
-        {% if question_list %}
-            {% load homepage_filters %}
-            {% for question in question_list %}
-            <div class="row">
-                <div class="col" style="text-align: center;">
-                    <div>{{ question.vote_sum }}</div>
-                    <div>Votes</div>
-               </div>
-                <div class="col" style="text-align: center;">
-                    <div>{{ question.answer_cnt }}</div>
-                    <div>Answers</div>
-               </div>
-                <div class="col-8">
-                    <p><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></p>
-                    {% for tag in question.tags.all %}
-                    <span class="badge badge-primary">{{ tag.name }}</span>
-                    {% endfor %}
-               </div>
-                <div class="col-2">
-                   <div align="right">
-                        <img src="{{ media_url }}{{ question.user__userprofile__avatar }}" width="35" height="35" class="right"  alt="no image">
-                        <div style="float:right;width:70px;text-align: left;">    {{ question.user__username }}</div>
-                       <div style = "text-align:center">
-                        <small class="form-text text-muted">asked {{ question.create_date|get_answered_date_string }}</small>
-                       </div>
+
+    <div class="text-right">
+        <div class="btn-group" role="group" align="right">
+            <a class="{% if ordering == '0' %}btn btn-secondary{% else %}btn btn-outline-secondary{% endif %}" href="{% url 'index' %}?ordering=0" >New questions</a>
+            <a class="{% if ordering == '1' %}btn btn-secondary{% else %}btn btn-outline-secondary{% endif %}" href="{% url 'index'%}?ordering=1">Hot questions</a>
+        </div>
+    </div>
+
+
+    <hr>
+    <div id="question_list">
+    {% if question_list %}
+        {% load homepage_filters %}
+        {% for question in question_list %}
+        <div class="row">
+            <div class="col" style="text-align: center;">
+                <div>{{ question.vote_sum }}</div>
+                <div>Votes</div>
+           </div>
+            <div class="col" style="text-align: center;">
+                <div>{{ question.answer_cnt }}</div>
+                <div>Answers</div>
+           </div>
+            <div class="col-8">
+                <p><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></p>
+                {% for tag in question.tags.all %}
+                <span class="badge badge-primary">{{ tag.name }}</span>
+                {% endfor %}
+           </div>
+            <div class="col-2">
+               <div align="right">
+                    <img src="{{ media_url }}{{ question.user__userprofile__avatar }}" width="35" height="35" class="right"  alt="no image">
+                    <div style="float:right;width:70px;text-align: left;">    {{ question.user__username }}</div>
+                   <div style = "text-align:center">
+                    <small class="form-text text-muted">asked {{ question.create_date|get_answered_date_string }}</small>
                    </div>
                </div>
-            </div>
-            <hr>
-            {% endfor %}
-        {% else %}
-            <p>No questions.</p>
-        {% endif %}
+           </div>
+        </div>
+        <hr>
+        {% endfor %}
+        <nav aria-label="...">
+          <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">Prev</a>
+                </li>
+              {% endif %}
+
+              {% for i in paginator.page_range %}
+                  {% if page_obj.number == i %}
+                    <li class="page-item active">
+                        <a class="page-link" href="?page={{i}}">{{ i }} <span class="sr-only">(current)</span></a>
+                    </li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                  {% endif %}
+
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+              {% endif %}
+
+          </ul>
+        </nav>
+    {% else %}
+        <p>No questions.</p>
+    {% endif %}
     </div>
-    <div id="hot_questions" class="container tab-pane fade"><br>
-        {% if question_list %}
-            <ul>
-            {% for question in question_list %}
-                <li><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No questions.</p>
-        {% endif %}
-    </div>
-  </div>
+
+
 </div>
 
 {% endblock %}

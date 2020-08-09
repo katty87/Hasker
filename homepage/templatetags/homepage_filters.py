@@ -5,14 +5,6 @@ from homepage.models import Answer
 register = template.Library()
 
 
-@register.filter(name='get_current_user_vote')
-def get_current_user_vote(object, user_id):
-    if type(object) is Answer:
-        return object.current_user_vote(user_id)
-
-    return None
-
-
 @register.filter(name='get_answered_date_string')
 def get_answered_date_string(value):
     delta = datetime.utcnow() - value

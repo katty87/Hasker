@@ -31,9 +31,9 @@
 {% for answer in answer_list %}
 <div class="row">
     <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
+        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer.current_user_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
         <div id="answer-vote-{{ answer.id }}">{{ answer.vote_sum }}</div>
-        <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer|get_current_user_vote:user.id == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
+        <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer.current_user_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
         <p style="{% if user.id == question.user.id %} cursor:pointer;color:black{% else %}cursor:default;color:#D3D3D3{% endif %};font-size:20px" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
     </div>
     <div class="col-md-10">
@@ -151,6 +151,7 @@
     }
 
 	function vote_ans(id, vote_value) {
+
         $.ajax({
             url: '{% url 'vote_answer' %}',
             type: 'POST',
