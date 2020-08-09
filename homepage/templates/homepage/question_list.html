@@ -1,0 +1,35 @@
+
+{% if question_list %}
+    {% load homepage_filters %}
+    {% for question in question_list %}
+    <div class="row">
+        <div class="col" style="text-align: center;">
+            <div>{{ question.vote_sum }}</div>
+            <div>Votes</div>
+       </div>
+        <div class="col" style="text-align: center;">
+            <div>{{ question.answer_cnt }}</div>
+            <div>Answers</div>
+       </div>
+        <div class="col-8">
+            <p><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></p>
+            {% for tag in question.tag_list|split:"," %}
+            <a class="badge badge-primary" href="{% url 'search_results' %}?q=tag:{{ tag }}">{{ tag }}</a>
+            {% endfor %}
+       </div>
+        <div class="col-2">
+           <div align="right">
+                <img src="{{ media_url }}{{ question.user__userprofile__avatar }}" width="35" height="35" class="right"  alt="no image">
+                <div style="float:right;width:70px;text-align: left;">    {{ question.user__username }}</div>
+               <div style = "text-align:center">
+                <small class="form-text text-muted">asked {{ question.create_date|get_answered_date_string }}</small>
+               </div>
+           </div>
+       </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+{% else %}
+    <p>No questions.</p>
+{% endif %}

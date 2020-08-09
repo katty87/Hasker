@@ -10,10 +10,19 @@ from django.core.files.images import get_image_dimensions
 from homepage.models import UserProfile
 
 
+def check_avatar(avatar):
+    if avatar:
+        if avatar.size > 1 * 1024 * 1024:
+            raise ValidationError("Avatar picture too big ( > 1mb )")
+
+        width, height = get_image_dimensions(avatar.file)
+
+        if width < 100 or height < 100:
+            raise ValidationError("Avatar picture must be at least 100x100 pixels")
+
+
 class SignUpForm(UserCreationForm):
     avatar = forms.ImageField(help_text='Load picture up to 1MB', required=False)
-    avatar_file = None
-    _f = ''
 
     class Meta:
         model = User
@@ -21,16 +30,7 @@ class SignUpForm(UserCreationForm):
 
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar', None)
-
-        if avatar:
-            if avatar.size > 1 * 1024 * 1024:
-                raise ValidationError("Avatar picture too big ( > 1mb )")
-
-            width, height = get_image_dimensions(avatar.file)
-
-            if width < 100 or height < 100:
-                raise ValidationError("Avatar picture must be at least 100x100 pixels")
-
+        check_avatar(avatar)
         return avatar
 
     def save(self, commit=True):
@@ -82,6 +82,19 @@ class QuestionDetailForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(QuestionDetailForm, self).__init__(*args, **kwargs)
         self.fields['answer_text'].error_messages = {'required': 'Body is missing.'}
+
+
+class UserSettings(forms.ModelForm):
+    email = forms.CharField(max_length=254, required=True)
+    avatar = forms.ImageField(help_text='Load picture up to 1MB', required=False)
+
+    class Meta:
+        model = UserProfile
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar', None)
+        check_avatar(avatar)
+        return avatar
 
 
 

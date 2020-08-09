@@ -6,10 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
 from django.views.generic.edit import FormMixin
-from django.views.generic.edit import FormMixin
 from django.views.generic import ListView
 
-from django.db.models import Sum, Count, When, Case
+from django.db.models import Sum, Count, When, Case, Exists, OuterRef
 from django.db.models.functions import Coalesce
 
 from django.contrib.auth import login
@@ -22,11 +21,10 @@ from django.core.mail import send_mail
 import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from Hasker.settings import EMAIL_HOST_USER, MEDIA_URL
+from Hasker.settings import EMAIL_HOST_USER
 
-
-from homepage.forms import SignUpForm, AddQuestionForm, QuestionDetailForm
-from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
+from homepage.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
+from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile, GroupConcat
 
 
 class IndexView(generic.ListView):
@@ -38,11 +36,16 @@ class IndexView(generic.ListView):
         order_by = ['-vote_sum', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
             else ['-create_date', '-vote_sum']
 
-        return Question.objects.all() \
-            .annotate(answer_cnt=Count('answer', distinct=True), vote_sum=Count('questionvote', distinct=True)) \
+        qs = Question.objects.all() \
+            .annotate(answer_cnt=Count('answer', distinct=True),
+                      vote_sum=Count('questionvote__id', distinct=True),
+                      tag_list=GroupConcat('tags__name', distinct=True)) \
             .order_by(*order_by) \
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
-                    'answer_cnt', 'vote_sum')
+                    'answer_cnt', 'vote_sum', 'tag_list')
+
+        print(qs.query)
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
@@ -59,10 +62,42 @@ class SearchResultsView(generic.ListView):
     model = Question
     template_name = 'homepage/search_results.html'
     context_object_name = 'question_list'
+    paginate_by = 20
 
     def get_queryset(self):
-        search_string = self.request.GET.get('q')
-        return Question.objects.filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
+        search_string = self.request.GET.get('q', '').strip()
+
+        if not search_string:
+            queryset = Question.objects.all()
+        else:
+            words = search_string.split(':')
+            if words[0].strip().lower() == 'tag':
+                if len(words) == 1:
+                    queryset = Question.objects.all()
+                else:
+                    queryset = Question.objects \
+                        .filter(
+                            Exists(Tag.objects.filter(question=OuterRef('pk'), name=words[1].strip().lower()))
+                    )
+            else:
+                queryset = Question.objects \
+                    .filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
+
+        return queryset \
+            .annotate(answer_cnt=Count('answer', distinct=True),
+                      vote_sum=Count('questionvote__id', distinct=True),
+                      tag_list=GroupConcat('tags__name', distinct=True)) \
+            .order_by('-vote_sum', '-create_date') \
+            .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
+                    'answer_cnt', 'vote_sum', 'tag_list')
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchResultsView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q', '')
+        context.update({'q': q})
+        context.update({'tag_search': 1 if q.split(':')[0].strip().lower() == 'tag' else 0})
+
+        return context
 
 
 @login_required
@@ -170,7 +205,6 @@ class QuestionDetailView(ListView, FormMixin):
             return redirect('question_detail', pk=question.id)
 
         return self.get(request, *args, **kwargs)
-
 
 
 @login_required
@@ -313,9 +347,10 @@ class SignUpView(generic.CreateView):
 
 
 class SettingsView(LoginRequiredMixin, UpdateView):
+    form_class = UserSettings
     model = UserProfile
     template_name = 'registration/user_settings.html'
-    fields = ['avatar']
+    # fields = ['avatar']
 
     def get_success_url(self):
         redirect_to = self.request.POST['next']

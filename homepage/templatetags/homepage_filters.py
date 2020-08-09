@@ -1,8 +1,19 @@
 from django import template
 from datetime import datetime
-from homepage.models import Answer
+from homepage.models import QuestionVote
+from django.db.models import Sum
 
 register = template.Library()
+
+
+@register.filter(name='get_question_vote_sum')
+def get_question_vote_sum(object, question_id):
+    return QuestionVote.objects.filter(question_id=question_id).aggregate(Sum('value'))
+
+
+@register.filter(name='split')
+def split(value, key):
+    return value.split(key)
 
 
 @register.filter(name='get_answered_date_string')

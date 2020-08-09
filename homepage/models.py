@@ -3,7 +3,23 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.db.models import Sum
+from django.db.models import Aggregate, CharField
 import os
+
+
+class GroupConcat(Aggregate):
+    function = 'GROUP_CONCAT'
+    template = '%(function)s(%(distinct)s%(expressions)s%(ordering)s)'
+    allow_distinct = True
+
+    def __init__(self, expression, distinct=False, ordering=None, **extra):
+        super(GroupConcat, self).__init__(
+            expression,
+            distinct='DISTINCT ' if distinct else '',
+            ordering=' ORDER BY %s' % ordering if ordering is not None else '',
+            output_field=CharField(),
+            **extra
+        )
 
 
 def get_image_path(instance, filename):

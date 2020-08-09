@@ -2,16 +2,36 @@
 
 {% block content %}
 
-    <h1>Search results</h1>
+<h1>{% if tag_search == 1 %}Tag{% else %}Search{% endif %} result</h1>
+{% include "homepage/question_list.html" %}
 
-    {% if question_list %}
-        <ul>
-        {% for question in question_list %}
-            <li><a href="{% url 'question_detail' question.id %}">{{ question.header }}</a></li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No questions.</p>
-    {% endif %}
+{% if question_list %}
+    <nav aria-label="...">
+      <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q }}" tabindex="-1">Prev</a>
+            </li>
+          {% endif %}
+
+          {% for i in paginator.page_range %}
+              {% if page_obj.number == i %}
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{i}}">{{ i }} <span class="sr-only">(current)</span></a>
+                </li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{i}}&q={{ q }}">{{i}}</a></li>
+              {% endif %}
+
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q }}">Next</a>
+            </li>
+          {% endif %}
+      </ul>
+    </nav>
+{% endif %}
 
 {% endblock %}

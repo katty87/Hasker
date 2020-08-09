@@ -17,7 +17,7 @@
             {{ question.content|linebreaks }}
         </p>
        {% for tag in question.tags.all %}
-       <span class="badge badge-primary">{{ tag.name }}</span>
+       <a class="badge badge-primary" href="{% url 'search_results' %}?q=tag:{{ tag.name }}">{{ tag.name }}</a>
        {% endfor %}
        <div align="right">
             <img src="{{ question.user.userprofile.avatar.url }}" width="50" height="50" class="right"  alt="no image">
