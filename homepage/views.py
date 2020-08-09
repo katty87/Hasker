@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
+from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin
 from django.views.generic import ListView
 
 from django.db.models import Sum, Count, When, Case
@@ -23,7 +25,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from Hasker.settings import EMAIL_HOST_USER, MEDIA_URL
 
 
-from homepage.forms import SignUpForm, AddQuestionForm
+from homepage.forms import SignUpForm, AddQuestionForm, QuestionDetailForm
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
 
 
@@ -44,7 +46,6 @@ class IndexView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context.update({'media_url': MEDIA_URL})
         context.update({'ordering': self.request.GET.get('ordering', '0')})
 
         return context
@@ -102,7 +103,8 @@ def ask_view(request):
     return render(request, 'homepage/add_question.html', context)
 
 
-class QuestionDetailView(ListView):
+class QuestionDetailView(ListView, FormMixin):
+    form_class = QuestionDetailForm
     model = Answer
     template_name = 'homepage/detail_question.html'
     context_object_name = 'answer_list'
@@ -135,9 +137,40 @@ class QuestionDetailView(ListView):
             context.update({'question_vote': question.current_user_vote(user_id)})
             context.update({'question': question})
 
-        context.update({'media_url': MEDIA_URL})
-
         return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user:
+            self.get(request, *args, **kwargs)
+
+        form = self.get_form()
+
+        if form.is_valid():
+            question = get_object_or_404(Question, pk=self.kwargs.get('pk', ''))
+            answer = Answer()
+            answer.content = request.POST['answer_text']
+            answer.question = question
+            answer.create_date = datetime.utcnow()
+            answer.is_correct = False
+            answer.user = request.user
+            answer.save()
+
+            send_mail(
+                'Hasker: new answer to your question',
+                '',
+                EMAIL_HOST_USER,
+                [question.user.email],
+                fail_silently=True,
+                html_message=
+                '<!DOCTYPE html><html><body>You have got a new answer to your question.\n '
+                'If you would like to see it please click '
+                '<a href="{full_url}">{full_url}</a>'
+                '</body></html>'.format(full_url=request.META['HTTP_REFERER'])
+            )
+            return redirect('question_detail', pk=question.id)
+
+        return self.get(request, *args, **kwargs)
+
 
 
 @login_required
@@ -145,26 +178,29 @@ class QuestionDetailView(ListView):
 def answer_question(request, pk):
     question = get_object_or_404(Question, pk=pk)
 
-    answer = Answer()
-    answer.content = request.POST['answer_text']
-    answer.question = question
-    answer.create_date = datetime.utcnow()
-    answer.is_correct = False
-    answer.user = request.user
-    answer.save()
+    form = QuestionDetailForm(request.POST)
 
-    send_mail(
-        'Hasker: new answer to your question',
-        '',
-        EMAIL_HOST_USER,
-        [question.user.email],
-        fail_silently=True,
-        html_message=
-        '<!DOCTYPE html><html><body>You have got a new answer to your question.\n '
-        'If you would like to see it please click '
-        '<a href="{full_url}">{full_url}</a>'
-        '</body></html>'.format(full_url=request.META['HTTP_REFERER'])
-    )
+    if form.is_valid():
+        answer = Answer()
+        answer.content = request.POST['answer_text']
+        answer.question = question
+        answer.create_date = datetime.utcnow()
+        answer.is_correct = False
+        answer.user = request.user
+        answer.save()
+
+        send_mail(
+            'Hasker: new answer to your question',
+            '',
+            EMAIL_HOST_USER,
+            [question.user.email],
+            fail_silently=True,
+            html_message=
+            '<!DOCTYPE html><html><body>You have got a new answer to your question.\n '
+            'If you would like to see it please click '
+            '<a href="{full_url}">{full_url}</a>'
+            '</body></html>'.format(full_url=request.META['HTTP_REFERER'])
+        )
 
     return redirect('question_detail', pk=question.id)
 

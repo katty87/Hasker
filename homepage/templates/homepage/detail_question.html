@@ -79,11 +79,12 @@
 <br>
 <br>
 {% if user.is_authenticated %}
-<form action="{% url 'answer_question' question.id %}" method="post">
+<form  method="post">
     {% csrf_token %}
     <div class="form-group">
-        <label for="answer"><b>Your answer</b></label>
-        <textarea class="form-control" name="answer_text" id="answer" rows="3"></textarea>
+        <label for="answer_text"><b>Your answer</b></label>
+        <textarea class="form-control" name="answer_text" id="answer_text" rows="3"></textarea>
+        <p style="color: red">{{ form.answer_text.errors.as_text }}</p>
     </div>
 
     <div class="button">

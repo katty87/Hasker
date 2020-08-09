@@ -53,8 +53,8 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class AddQuestionForm(forms.Form):
-    title = forms.CharField(label='Title', max_length=256, required=True)
-    content = forms.CharField(label='Text', max_length=4096, required=True)
+    title = forms.CharField(max_length=256, required=True)
+    content = forms.CharField(max_length=4096, required=True)
 
     error_css_class = 'error'
     required_css_class = 'required'
@@ -71,6 +71,17 @@ class AddQuestionForm(forms.Form):
             raise ValidationError('Please enter at least 100 characters')
 
         return content
+
+
+class QuestionDetailForm(forms.Form):
+    answer_text = forms.CharField(max_length=4096, required=True)
+
+    error_css_class = 'error'
+    required_css_class = 'required'
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionDetailForm, self).__init__(*args, **kwargs)
+        self.fields['answer_text'].error_messages = {'required': 'Body is missing.'}
 
 
 
