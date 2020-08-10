@@ -155,7 +155,7 @@ class QuestionDetailView(ListView, FormMixin):
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0),
                       current_user_vote=Sum(
                           Case(When(answervote__user_id=user_id, then='answervote__value'), default=0))) \
-            .order_by('-vote_sum', 'create_date').values('id', 'content', 'user__username', 'user__userprofile__avatar',
+            .order_by('-vote_sum', 'create_date').values('id', 'content', 'is_correct', 'user__username', 'user__userprofile__avatar',
                                                          'vote_sum', 'current_user_vote')
 
     def get_context_data(self, **kwargs):
@@ -269,7 +269,7 @@ def vote_question(request):
     else:
         question_vote.save()
 
-    return JsonResponse({'current_vote': question_vote.value, 'total_votes': question.vote_count()})
+    return JsonResponse({'current_vote': question_vote.value, 'total_votes': question.vote_sum()})
 
 
 @login_required
@@ -299,7 +299,7 @@ def vote_answer(request):
 
     answer_vote.save()
 
-    return JsonResponse({'current_vote': answer_vote.value, 'total_votes': answer.vote_count()})
+    return JsonResponse({'current_vote': answer_vote.value, 'total_votes': answer.vote_sum()})
 
 
 @login_required
@@ -324,7 +324,7 @@ def mark_answer_right(request):
 
 class SignUpView(generic.CreateView):
     form_class = SignUpForm
-    template_name = "signup.html"
+    template_name = "registration/signup.html"
 
     def get_success_url(self):
         redirect_to = self.request.POST['next']

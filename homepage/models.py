@@ -49,7 +49,7 @@ class Question(models.Model):
     create_date = models.DateTimeField()
     tags = models.ManyToManyField(Tag)
 
-    def vote_count(self):
+    def vote_sum(self):
         cnt = QuestionVote.objects.filter(question_id=self.id).aggregate(Sum('value')).get('value__sum')
         return cnt if cnt else 0
 
@@ -69,7 +69,7 @@ class Answer(models.Model):
     create_date = models.DateTimeField()
     is_correct = models.BooleanField()
 
-    def vote_count(self):
+    def vote_sum(self):
         cnt = AnswerVote.objects.filter(answer_id=self.id).aggregate(Sum('value')).get('value__sum')
         return cnt if cnt else 0
 
