@@ -30,19 +30,19 @@ from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, Use
 class IndexView(generic.ListView):
     template_name = 'homepage/index.html'
     context_object_name = 'question_list'
-    paginate_by = 20
+    paginate_by = 3
 
     def get_queryset(self):
-        order_by = ['-vote_sum', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
-            else ['-create_date', '-vote_sum']
+        order_by = ['-vote_cnt', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
+            else ['-create_date', '-vote_cnt']
 
         qs = Question.objects.all() \
             .annotate(answer_cnt=Count('answer', distinct=True),
-                      vote_sum=Count('questionvote__id', distinct=True),
+                      vote_cnt=Count('questionvote__id', fiter=Q(questionvote__id=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
             .order_by(*order_by) \
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
-                    'answer_cnt', 'vote_sum', 'tag_list')
+                    'answer_cnt', 'vote_cnt', 'tag_list')
 
         print(qs.query)
         return qs
@@ -62,7 +62,7 @@ class SearchResultsView(generic.ListView):
     model = Question
     template_name = 'homepage/search_results.html'
     context_object_name = 'question_list'
-    paginate_by = 20
+    paginate_by = 3
 
     def get_queryset(self):
         search_string = self.request.GET.get('q', '').strip()
@@ -85,11 +85,11 @@ class SearchResultsView(generic.ListView):
 
         return queryset \
             .annotate(answer_cnt=Count('answer', distinct=True),
-                      vote_sum=Count('questionvote__id', distinct=True),
+                      vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
-            .order_by('-vote_sum', '-create_date') \
+            .order_by('-vote_cnt', '-create_date') \
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
-                    'answer_cnt', 'vote_sum', 'tag_list')
+                    'answer_cnt', 'vote_cnt', 'tag_list')
 
     def get_context_data(self, **kwargs):
         context = super(SearchResultsView, self).get_context_data(**kwargs)
@@ -264,7 +264,10 @@ def vote_question(request):
     else:
         question_vote.value = int(value)
 
-    question_vote.save()
+    if question_vote.value == 0:
+        question_vote.delete()
+    else:
+        question_vote.save()
 
     return JsonResponse({'current_vote': question_vote.value, 'total_votes': question.vote_count()})
 
