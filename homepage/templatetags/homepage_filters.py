@@ -13,7 +13,10 @@ def get_question_vote_sum(object, question_id):
 
 @register.filter(name='split')
 def split(value, key):
-    return value.split(key)
+    if value:
+        return value.split(key)
+    else:
+        return None
 
 
 @register.filter(name='get_answered_date_string')

@@ -30,7 +30,7 @@ from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, Use
 class IndexView(generic.ListView):
     template_name = 'homepage/index.html'
     context_object_name = 'question_list'
-    paginate_by = 3
+    paginate_by = 20
 
     def get_queryset(self):
         order_by = ['-vote_cnt', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
@@ -44,7 +44,6 @@ class IndexView(generic.ListView):
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
                     'answer_cnt', 'vote_cnt', 'tag_list')
 
-        print(qs.query)
         return qs
 
     def get_context_data(self, **kwargs):
@@ -62,7 +61,7 @@ class SearchResultsView(generic.ListView):
     model = Question
     template_name = 'homepage/search_results.html'
     context_object_name = 'question_list'
-    paginate_by = 3
+    paginate_by = 20
 
     def get_queryset(self):
         search_string = self.request.GET.get('q', '').strip()
