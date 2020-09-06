@@ -33,16 +33,16 @@ class IndexView(generic.ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        order_by = ['-vote_cnt', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
-            else ['-create_date', '-vote_cnt']
+        order_by = ['-vote_sum', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
+            else ['-create_date', '-vote_sum']
 
         qs = Question.objects.all() \
             .annotate(answer_cnt=Count('answer', distinct=True),
-                      vote_cnt=Count('questionvote__id', fiter=Q(questionvote__id=0), distinct=True),
+                      vote_sum=Count('questionvote__id', fiter=Q(questionvote__id=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
             .order_by(*order_by) \
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
-                    'answer_cnt', 'vote_cnt', 'tag_list')
+                    'answer_cnt', 'vote_sum', 'tag_list')
 
         return qs
 
@@ -86,9 +86,9 @@ class SearchResultsView(generic.ListView):
             .annotate(answer_cnt=Count('answer', distinct=True),
                       vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
-            .order_by('-vote_cnt', '-create_date') \
+            .order_by('-vote_sum', '-create_date') \
             .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
-                    'answer_cnt', 'vote_cnt', 'tag_list')
+                    'answer_cnt', 'vote_sum', 'tag_list')
 
     def get_context_data(self, **kwargs):
         context = super(SearchResultsView, self).get_context_data(**kwargs)
