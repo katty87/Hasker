@@ -127,9 +127,9 @@ class AnswerModelTests(TestCase):
         user3 = User.objects.get(username='user3')
         user4 = User.objects.get(username='user4')
 
-        vote_question(answer, user2, 1)
-        vote_question(answer, user3, -1)
-        vote_question(answer, user4, 1)
+        vote_answer(answer, user2, 1)
+        vote_answer(answer, user3, -1)
+        vote_answer(answer, user4, 1)
 
         self.assertEqual(answer.vote_sum(), 1)
 
