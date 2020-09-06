@@ -99,7 +99,7 @@ class AnswerModelTests(TestCase):
         user = User.objects.get(username='user2')
 
         answer_vote = AnswerVote()
-        answer_vote.question = answer
+        answer_vote.answer = answer
         answer_vote.user = user
         answer_vote.value = 1
         answer_vote.save()
@@ -141,9 +141,9 @@ class AnswerModelTests(TestCase):
         self.assertEqual(answer.current_user_vote(user.id), 1)
 
 
-def vote_answer(question, user, value):
-    question_vote = QuestionVote()
-    question_vote.question = question
-    question_vote.user = user
-    question_vote.value = value
-    question_vote.save()
+def vote_answer(answer, user, value):
+    answer_vote = AnswerVote()
+    answer_vote.answer = answer
+    answer_vote.user = user
+    answer_vote.value = value
+    answer_vote.save()
