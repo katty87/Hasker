@@ -50,14 +50,14 @@
                     <a class="btn btn-primary btn-block" href="{% url 'ask' %}" role="button">Ask!</a>
                 </li>
                 {% if trending_question_list %}
-                    <ul>
+
                     {% for question in trending_question_list %}
                         <li>
                         <span class="badge badge-primary">{{ question.vote_sum }}</span>
                         <a href="{% url 'question_detail' question.id %}">{{ question.header }}</a>
                         </li>
                     {% endfor %}
-                    </ul>
+
                 {% else %}
                     <p>No questions.</p>
                 {% endif %}

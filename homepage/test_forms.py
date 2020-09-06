@@ -1,4 +1,3 @@
-import pytest
 from django.test import TestCase
 
 from homepage.forms import SignUpForm, UserSettings, AddQuestionForm, QuestionDetailForm

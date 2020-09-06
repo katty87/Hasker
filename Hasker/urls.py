@@ -25,4 +25,4 @@ urlpatterns = [
     path('homepage/', include('homepage.urls')),
     path('', RedirectView.as_view(url='homepage/')),
     path('accounts/', include('django.contrib.auth.urls')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

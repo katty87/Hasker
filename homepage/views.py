@@ -77,7 +77,7 @@ class SearchResultsView(generic.ListView):
                     queryset = Question.objects \
                         .filter(
                             Exists(Tag.objects.filter(question=OuterRef('pk'), name=words[1].strip().lower()))
-                    )
+                        )
             else:
                 queryset = Question.objects \
                     .filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
@@ -154,7 +154,8 @@ class QuestionDetailView(ListView, FormMixin):
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0),
                       current_user_vote=Sum(
                           Case(When(answervote__user_id=user_id, then='answervote__value'), default=0))) \
-            .order_by('-vote_sum', 'create_date').values('id', 'content', 'is_correct', 'user__username', 'user__userprofile__avatar',
+            .order_by('-vote_sum', 'create_date').values('id', 'content', 'is_correct', 'user__username',
+                                                         'user__userprofile__avatar',
                                                          'vote_sum', 'current_user_vote')
 
     def get_context_data(self, **kwargs):

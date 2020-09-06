@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.test import TestCase
 from django.urls import reverse
-from django.test import Client
 
 from homepage.models import Question, User, Tag
 

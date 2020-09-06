@@ -1,10 +1,11 @@
-from django.db import models
+import os
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.conf import settings
-from django.db.models import Sum
+from django.db import models
 from django.db.models import Aggregate, CharField
-import os
+from django.db.models import Sum
 
 
 class GroupConcat(Aggregate):
