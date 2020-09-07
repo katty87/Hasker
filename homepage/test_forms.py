@@ -27,5 +27,5 @@ class AddQuestionFormTest(TestCase):
 
 class QuestionDetailFormTest(TestCase):
     def test_empty_content(self):
-        form = QuestionDetailForm(data={'answer_text': 'my answer'})
+        form = QuestionDetailForm(data={'answer_text': ''})
         self.assertFalse(form.is_valid())

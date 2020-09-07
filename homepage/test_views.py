@@ -182,15 +182,18 @@ class QuestionDetailViewTest(TestCase):
                 user=user)
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/question/1/')
+        question = Question.objects.all().first()
+        response = self.client.get('/homepage/question/{}/'.format(question.id))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('question_detail', args=(1,)))
+        question = Question.objects.all().first()
+        response = self.client.get(reverse('question_detail', args=(question.id,)))
         self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('question_detail', args=(1,)))
+        question = Question.objects.all().first()
+        response = self.client.get(reverse('question_detail', args=(question.id,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'homepage/detail_question.html')
 
@@ -216,21 +219,21 @@ class SignUpViewTest(TestCase):
 
 class SettingsViewTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
-        user.userprofile.avatar = 'default_avatar.png'
-        user.save()
+        self.user = User.objects.create_user('user1', 'test@test.com', '12345')
+        self.user.userprofile.avatar = 'default_avatar.png'
+        self.user.save()
         self.client.login(username='user1', password='12345')
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/settings/1/')
+        response = self.client.get('/homepage/settings/{}/'.format(self.user.id))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('settings', args=(1,)))
+        response = self.client.get(reverse('settings', args=(self.user.id,)))
         self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('settings', args=(1,)))
+        response = self.client.get(reverse('settings', args=(self.user.id,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/user_settings.html')
 

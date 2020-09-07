@@ -10,18 +10,20 @@ class QuestionModelTests(TestCase):
     def setUpTestData(cls):
         user = User.objects.create_user('user1', 'test@test.com', '12345')
         Question.objects.create(header='How to ...?', content='Some text', create_date=datetime.now(),
-                                user=user)
+                                    user=user)
 
         User.objects.create_user('user2', 'test2@test.com', '12345')
         User.objects.create_user('user3', 'test3@test.com', '12345')
         User.objects.create_user('user4', 'test4@test.com', '12345')
 
     def test_no_votes_sum(self):
-        question = Question.objects.get(id=1)
+        user1 = User.objects.get(username='user1')
+        question = Question.objects.filter(user=user1).first()
         self.assertEqual(question.vote_sum(), 0)
 
     def test_cancel_vote_sum(self):
-        question = Question.objects.get(id=1)
+        user1 = User.objects.get(username='user1')
+        question = Question.objects.filter(user=user1).first()
         user = User.objects.get(username='user2')
 
         question_vote = QuestionVote()
@@ -36,7 +38,8 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), 0)
 
     def test_below_zero_vote_sum(self):
-        question = Question.objects.get(id=1)
+        user1 = User.objects.get(username='user1')
+        question = Question.objects.filter(user=user1).first()
         user2 = User.objects.get(username='user2')
         user3 = User.objects.get(username='user3')
         user4 = User.objects.get(username='user4')
@@ -48,7 +51,8 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), -1)
 
     def test_above_zero_vote_sum(self):
-        question = Question.objects.get(id=1)
+        user1 = User.objects.get(username='user1')
+        question = Question.objects.filter(user=user1).first()
         user2 = User.objects.get(username='user2')
         user3 = User.objects.get(username='user3')
         user4 = User.objects.get(username='user4')
@@ -60,7 +64,8 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), 1)
 
     def test_current_user_vote(self):
-        question = Question.objects.get(id=1)
+        user1 = User.objects.get(username='user1')
+        question = Question.objects.filter(user=user1).first()
         user = User.objects.get(username='user2')
 
         vote_question(question, user, 1)
