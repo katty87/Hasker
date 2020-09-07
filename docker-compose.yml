@@ -1,0 +1,20 @@
+  version: '3'
+    
+  services:
+    db:
+      image: postgres
+      environment:
+        - POSTGRES_DB=haskerdb
+        - POSTGRES_USER=django
+        - POSTGRES_PASSWORD=django
+    web:
+      build: .
+      command: /code/hasker/entrypoint.sh
+      volumes:
+        - .:/code/hasker
+      ports:
+        - "8000:80"
+      depends_on:
+        - db
+      links:
+        - db:db
