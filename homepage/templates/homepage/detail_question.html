@@ -189,7 +189,6 @@
             type: 'POST',
             data:{answer_id: id, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(response) {
-                alert(response)
                 if (response == 1) {
                     document.getElementById("answer-right-" + id).innerHTML = '&#9733;';
                 } else if (response == 0) {
