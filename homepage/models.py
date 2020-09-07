@@ -9,8 +9,8 @@ from django.db.models import Sum
 
 
 class GroupConcat(Aggregate):
-    function = 'GROUP_CONCAT'
-    template = '%(function)s(%(distinct)s%(expressions)s%(ordering)s)'
+    function = 'STRING_AGG'
+    # template = '%(function)s(%(distinct)s%(expressions)s%(ordering)s)'
     allow_distinct = True
 
     def __init__(self, expression, distinct=False, ordering=None, **extra):
@@ -21,6 +21,13 @@ class GroupConcat(Aggregate):
             output_field=CharField(),
             **extra
         )
+
+    def as_sql(self, compiler, connection, **extra_context):
+        sql, params = super().as_sql(
+            compiler, connection,  **extra_context
+        )
+        sql_len = len(sql)
+        return sql[:sql_len-1] + ',\',\')', params
 
 
 def get_image_path(instance, filename):
