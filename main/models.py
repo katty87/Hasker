@@ -63,11 +63,9 @@ class Question(models.Model):
 
     def current_user_vote(self, user_id):
         try:
-            question_vote = QuestionVote.objects.get(question_id=self.id, user_id=user_id)
+            return QuestionVote.objects.get(question_id=self.id, user_id=user_id)
         except QuestionVote.DoesNotExist:
             return 0
-
-        return question_vote.value
 
 
 class Answer(models.Model):
@@ -83,11 +81,9 @@ class Answer(models.Model):
 
     def current_user_vote(self, user_id):
         try:
-            answer_vote = AnswerVote.objects.get(answer_id=self.id, user_id=user_id)
+            return AnswerVote.objects.get(answer_id=self.id, user_id=user_id)
         except AnswerVote.DoesNotExist:
             return 0
-
-        return answer_vote.value
 
 
 class AnswerVote(models.Model):
