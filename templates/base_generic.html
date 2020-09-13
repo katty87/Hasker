@@ -13,7 +13,7 @@
     <nav class="navbar navbar-light bg-light" >
 
         <div>
-            <img src="{{ media_url }}logo.png" width="50" height="50">
+            <img src="{{ static_img_url }}logo.png" width="50" height="50">
             <a class="navbar-brand" href="{% url 'index' %}">
                 <h1>Hasker</h1>
             </a>
@@ -27,7 +27,7 @@
         </form>
         {% if user.is_authenticated %}
             <div align="right">
-                <img src="{{ user.userprofile.avatar.url }}" width="25" height="25">
+                <img src="{% if user.userprofile.avatar %}{{ user.userprofile.avatar.url }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="25" height="25">
                 <a class="btn btn-link" href="{% url 'settings' user.userprofile.id %}?next={{request.path}}">{{ user.username }}</a>
                 <a class="btn btn-outline-primary" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
             </div>

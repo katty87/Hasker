@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 
 from homepage.models import UserProfile
+import os
+from Hasker.settings import STATIC_IMAGES_URL
 
 
 def check_avatar(avatar):
@@ -32,8 +34,6 @@ class SignUpForm(UserCreationForm):
         avatar = self.cleaned_data.get('avatar', None)
         if avatar:
             check_avatar(avatar)
-        else:
-            avatar = 'default_avatar.png'
         return avatar
 
     def save(self, commit=True):

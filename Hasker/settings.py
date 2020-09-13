@@ -88,7 +88,7 @@ DATABASES = {
         'NAME': 'haskerdb',
         'USER': 'django',
         'PASSWORD': 'django',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -130,6 +130,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_IMAGES_URL = os.path.join(STATIC_URL, "img/")
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),

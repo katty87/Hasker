@@ -20,7 +20,7 @@
        <a class="badge badge-primary" href="{% url 'search_results' %}?q=tag:{{ tag.name }}">{{ tag.name }}</a>
        {% endfor %}
        <div align="right">
-            <img src="{{ question.user.userprofile.avatar.url }}" width="50" height="50" class="right"  alt="no image">
+            <img src="{% if question.user.userprofile.avatar %}{{ question.user.userprofile.avatar.url}} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="50" height="50" class="right"  alt="no image">
            <div style="float:right;width:75px;text-align: left;">    {{ question.user.username }}</div>
        </div>
    </div>
@@ -39,7 +39,7 @@
     <div class="col-md-10">
         <p>{{ answer.content|linebreaks  }}</p>
         <div align="right">
-            <img src="{{ media_url }}{{ answer.user__userprofile__avatar }}" width="50" height="50" class="right"  alt="no image">
+            <img src="{% if answer.user__userprofile__avatar %}{{ media_url }}{{ answer.user__userprofile__avatar }}{% else %}{{ static_img_url }}default_avatar.png{% endif %}" width="50" height="50" class="right"  alt="no image">
            <div style="float:right;width:75px;text-align: left;">    {{ answer.user__username }}</div>
         </div>
     </div>
