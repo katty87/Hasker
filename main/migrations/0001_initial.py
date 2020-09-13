@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('header', models.CharField(max_length=256)),
                 ('content', models.CharField(max_length=4096)),
                 ('create_date', models.DateTimeField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='question_user', to='homepage.UserProfile')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='question_user', to='main.UserProfile')),
             ],
         ),
         migrations.CreateModel(
@@ -38,8 +38,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('content', models.CharField(max_length=4096)),
                 ('is_correct', models.BooleanField()),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='homepage.Question')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answer_user', to='homepage.Question')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.Question')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answer_user', to='main.Question')),
             ],
         ),
     ]

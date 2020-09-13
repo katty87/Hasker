@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from homepage.forms import SignUpForm, UserSettings, AddQuestionForm, QuestionDetailForm
+from main.forms import SignUpForm, UserSettings, AddQuestionForm, QuestionDetailForm
 
 
 class SignUpFormTest(TestCase):

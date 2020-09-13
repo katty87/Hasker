@@ -11,7 +11,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'homepage.apps.HomepageConfig'
+    'main.apps.MainConfig'
 ]
 
 MIDDLEWARE = [
@@ -33,7 +33,7 @@ LOGIN_REDIRECT_URL = '/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), 'templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -42,11 +42,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                'homepage.context_processors.trending_questions',
+                'main.context_processors.trending_questions',
             ],
 
             'libraries': {
-                'homepage_filters': 'homepage.templatetags.homepage_filters',
+                'main_filters': 'main.templatetags.main_filters',
 
             }
         },
@@ -71,7 +71,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_PROFILE_MODULE = 'homepage.UserProfile'
+AUTH_PROFILE_MODULE = 'main.UserProfile'
 
 LANGUAGE_CODE = 'en-us'
 

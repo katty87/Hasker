@@ -1,9 +1,9 @@
-{% extends "homepage/index.html" %}
+{% extends "main/index.html" %}
 
 {% block content %}
 
 <h1>{% if tag_search == 1 %}Tag{% else %}Search{% endif %} result</h1>
-{% include "homepage/question_list.html" %}
+{% include "main/question_list.html" %}
 
 {% if question_list %}
     <nav aria-label="...">

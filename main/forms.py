@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 
-from homepage.models import UserProfile
+from main.models import UserProfile
 
 
 def check_avatar(avatar):

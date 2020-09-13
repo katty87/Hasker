@@ -1,7 +1,7 @@
 from django.test import TestCase
 from datetime import datetime
 
-from homepage.models import Question, QuestionVote, Answer, AnswerVote
+from main.models import Question, QuestionVote, Answer, AnswerVote
 from django.contrib.auth.models import User
 
 

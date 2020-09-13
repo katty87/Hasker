@@ -3,7 +3,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.urls import reverse
 
-from homepage.models import Question, User, Tag
+from main.models import Question, User, Tag
 
 
 class IndexViewTest(TestCase):
@@ -20,7 +20,7 @@ class IndexViewTest(TestCase):
                 user=user)
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/')
+        response = self.client.get('/main/')
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -30,7 +30,7 @@ class IndexViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'homepage/index.html')
+        self.assertTemplateUsed(response, 'main/index.html')
 
     def test_pagination_is_twenty(self):
         response = self.client.get(reverse('index'))
@@ -98,7 +98,7 @@ class SearchViewTest(TestCase):
                 user=user)
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/search')
+        response = self.client.get('/main/search')
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -108,7 +108,7 @@ class SearchViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('search_results'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'homepage/search_results.html')
+        self.assertTemplateUsed(response, 'main/search_results.html')
 
     def test_pagination_is_twenty(self):
         response = self.client.get(reverse('search_results'))
@@ -153,7 +153,7 @@ class AskQuestionViewTest(TestCase):
         self.client.login(username='user1', password='12345')
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/ask')
+        response = self.client.get('/main/ask')
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -163,7 +163,7 @@ class AskQuestionViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('ask'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'homepage/add_question.html')
+        self.assertTemplateUsed(response, 'main/add_question.html')
 
 
 class QuestionDetailViewTest(TestCase):
@@ -183,7 +183,7 @@ class QuestionDetailViewTest(TestCase):
 
     def test_view_url_exists_at_desired_location(self):
         question = Question.objects.all().first()
-        response = self.client.get('/homepage/question/{}/'.format(question.id))
+        response = self.client.get('/main/question/{}/'.format(question.id))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -195,7 +195,7 @@ class QuestionDetailViewTest(TestCase):
         question = Question.objects.all().first()
         response = self.client.get(reverse('question_detail', args=(question.id,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'homepage/detail_question.html')
+        self.assertTemplateUsed(response, 'main/detail_question.html')
 
     def test_view_incorrect_question_id(self):
         response = self.client.get(reverse('question_detail', args=(10,)))
@@ -204,7 +204,7 @@ class QuestionDetailViewTest(TestCase):
 
 class SignUpViewTest(TestCase):
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/signup')
+        response = self.client.get('/main/signup')
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -225,7 +225,7 @@ class SettingsViewTest(TestCase):
         self.client.login(username='user1', password='12345')
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/homepage/settings/{}/'.format(self.user.id))
+        response = self.client.get('/main/settings/{}/'.format(self.user.id))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):

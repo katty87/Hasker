@@ -23,12 +23,12 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 
-from homepage.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
-from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile, GroupConcat
+from main.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
+from main.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile, GroupConcat
 
 
 class IndexView(generic.ListView):
-    template_name = 'homepage/index.html'
+    template_name = 'main/index.html'
     context_object_name = 'question_list'
     paginate_by = 20
 
@@ -59,7 +59,7 @@ class IndexView(generic.ListView):
 
 class SearchResultsView(generic.ListView):
     model = Question
-    template_name = 'homepage/search_results.html'
+    template_name = 'main/search_results.html'
     context_object_name = 'question_list'
     paginate_by = 20
 
@@ -134,13 +134,13 @@ def ask_view(request):
         'tags': json.dumps(list(Tag.objects.all().values_list('name', flat=True)))
     }
 
-    return render(request, 'homepage/add_question.html', context)
+    return render(request, 'main/add_question.html', context)
 
 
 class QuestionDetailView(ListView, FormMixin):
     form_class = QuestionDetailForm
     model = Answer
-    template_name = 'homepage/detail_question.html'
+    template_name = 'main/detail_question.html'
     context_object_name = 'answer_list'
     paginate_by = 30
 

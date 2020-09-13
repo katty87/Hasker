@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('homepage', '0003_answervote_questionvote'),
+        ('main', '0003_answervote_questionvote'),
     ]
 
     operations = [
