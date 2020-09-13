@@ -21,7 +21,7 @@ from django.core.mail import send_mail
 import json
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from Hasker.settings import EMAIL_HOST_USER
+from django.conf import settings
 
 from homepage.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
 from homepage.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile, GroupConcat
@@ -193,7 +193,7 @@ class QuestionDetailView(ListView, FormMixin):
             send_mail(
                 'Hasker: new answer to your question',
                 '',
-                EMAIL_HOST_USER,
+                settings.EMAIL_HOST_USER,
                 [question.user.email],
                 fail_silently=True,
                 html_message=

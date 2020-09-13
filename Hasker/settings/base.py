@@ -2,12 +2,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '!q^vwef^38%+1a_f@icc73q6by#==)=zca)sgp)tlq&1owzox)'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -63,17 +57,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Hasker.wsgi.application'
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'haskerdb',
-        'USER': 'django',
-        'PASSWORD': 'django',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
