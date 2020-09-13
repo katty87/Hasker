@@ -86,16 +86,17 @@ class Answer(models.Model):
             return 0
 
 
-class AnswerVote(models.Model):
+class BaseVote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    value = models.IntegerField(default=0)
+
+
+class AnswerVote(BaseVote):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    value = models.IntegerField(default=0)
 
 
-class QuestionVote(models.Model):
+class QuestionVote(BaseVote):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    value = models.IntegerField(default=0)
 
 
 
