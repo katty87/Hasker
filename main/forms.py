@@ -1,11 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from main.models import UserProfile
 

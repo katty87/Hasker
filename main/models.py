@@ -1,44 +1,8 @@
-import os
-
-from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import Aggregate, CharField
 from django.db.models import Sum
 
-
-class GroupConcat(Aggregate):
-    function = 'STRING_AGG'
-    # template = '%(function)s(%(distinct)s%(expressions)s%(ordering)s)'
-    allow_distinct = True
-
-    def __init__(self, expression, distinct=False, ordering=None, **extra):
-        super(GroupConcat, self).__init__(
-            expression,
-            distinct='DISTINCT ' if distinct else '',
-            ordering=' ORDER BY %s' % ordering if ordering is not None else '',
-            output_field=CharField(),
-            **extra
-        )
-
-    def as_sql(self, compiler, connection, **extra_context):
-        sql, params = super().as_sql(
-            compiler, connection,  **extra_context
-        )
-        sql_len = len(sql)
-        return sql[:sql_len-1] + ',\',\')', params
-
-
-def get_image_path(instance, filename):
-    return os.path.join('profile_images', "{}".format(instance.id), filename)
-
-
-class OverwriteStorage(FileSystemStorage):
-    def get_available_name(self, name, max_length=None):
-        if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name
+from main.media_utils import get_image_path, OverwriteStorage
 
 
 class UserProfile(models.Model):

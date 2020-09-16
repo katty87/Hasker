@@ -1,5 +1,6 @@
 from django.db.models import Aggregate, CharField
 
+
 class GroupConcat(Aggregate):
     function = 'STRING_AGG'
     allow_distinct = True

@@ -25,18 +25,16 @@
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </div>
         </form>
+        <div align="right">
         {% if user.is_authenticated %}
-            <div align="right">
-                <img src="{% if user.userprofile.avatar %}{{ user.userprofile.avatar.url }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="25" height="25">
-                <a class="btn btn-link" href="{% url 'settings' user.userprofile.id %}?next={{request.path}}">{{ user.username }}</a>
-                <a class="btn btn-outline-primary" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
-            </div>
+            <img src="{% if user.userprofile.avatar %}{{ user.userprofile.avatar.url }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="25" height="25">
+            <a class="btn btn-link" href="{% url 'settings' user.userprofile.id %}?next={{request.path}}">{{ user.username }}</a>
+            <a class="btn btn-outline-primary" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
         {% else %}
-            <div align="right">
-                <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
-                <a class="btn btn-outline-primary" href="{% url 'signup'%}?next={{request.path}}">Sign Up</a>
-            </div>
+            <a class="btn btn-link" href="{% url 'login'%}?next={{request.path}}">Log In</a>
+            <a class="btn btn-outline-primary" href="{% url 'signup'%}?next={{request.path}}">Sign Up</a>
         {% endif %}
+        </div>
 
     </nav>
     <br>

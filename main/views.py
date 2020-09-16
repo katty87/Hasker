@@ -1,30 +1,28 @@
-from datetime import datetime
+import json
 import os
+from datetime import datetime
 
-from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-
-from django.views.generic.edit import FormMixin
-from django.views.generic import ListView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.db.models import Q
 from django.db.models import Sum, Count, When, Case, Exists, OuterRef
 from django.db.models.functions import Coalesce
-
-from django.contrib.auth import login
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.views import generic
+from django.http import HttpResponse
 from django.http import JsonResponse
-from django.core.mail import send_mail
-import json
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import generic
+from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
 from django.views.generic.edit import UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.conf import settings
 
+from main.aggregates_extension import GroupConcat
 from main.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
-from main.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile, GroupConcat
+from main.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
 
 
 class IndexView(generic.ListView):
