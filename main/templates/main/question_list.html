@@ -19,7 +19,7 @@
        </div>
         <div class="col-2">
            <div align="right">
-                <img src="{% if question.user__userprofile__avatar %}{{ media_url }}{{ question.user__userprofile__avatar }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="35" height="35" class="right"  alt="no image">
+                <img src="{% if question.user__avatar %}{{ media_url }}{{ question.user__avatar }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="35" height="35" class="right"  alt="no image">
                 <div style="float:right;width:70px;text-align: left;">    {{ question.user__username }}</div>
                <div style = "text-align:center">
                 <small class="form-text text-muted">asked {{ question.create_date|get_answered_date_string }}</small>

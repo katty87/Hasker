@@ -11,7 +11,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main.apps.MainConfig'
+    'main.apps.MainConfig',
+    'user.apps.UserConfig'
 ]
 
 MIDDLEWARE = [
@@ -43,6 +44,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'main.context_processors.trending_questions',
+                'user.context_processors.user_settings',
             ],
 
             'libraries': {
@@ -71,7 +73,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_PROFILE_MODULE = 'main.UserProfile'
+AUTH_USER_MODEL = 'user.User'
 
 LANGUAGE_CODE = 'en-us'
 

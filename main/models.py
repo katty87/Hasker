@@ -1,13 +1,8 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
 
-from main.media_utils import get_image_path, OverwriteStorage
 
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(null=True, upload_to=get_image_path, storage=OverwriteStorage())
+from user.models import User
 
 
 class Tag(models.Model):

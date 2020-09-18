@@ -1,12 +1,10 @@
 import json
-import os
+
 from datetime import datetime
 
 from django.conf import settings
-from django.contrib.auth import login
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.models import Sum, Count, When, Case, Exists, OuterRef
@@ -18,11 +16,12 @@ from django.views import generic
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin
-from django.views.generic.edit import UpdateView
+
 
 from main.aggregates_extension import GroupConcat
-from main.forms import SignUpForm, AddQuestionForm, QuestionDetailForm, UserSettings
-from main.models import Question, QuestionVote, Answer, AnswerVote, Tag, UserProfile
+from main.forms import AddQuestionForm, QuestionDetailForm
+from main.models import Question, QuestionVote, Answer, AnswerVote, Tag
+from user.models import User
 
 
 class IndexView(generic.ListView):
@@ -39,7 +38,7 @@ class IndexView(generic.ListView):
                       vote_sum=Count('questionvote__id', fiter=Q(questionvote__id=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
             .order_by(*order_by) \
-            .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
+            .values('id', 'header', 'create_date', 'user__username', 'user__avatar',
                     'answer_cnt', 'vote_sum', 'tag_list')
 
         return qs
@@ -85,7 +84,7 @@ class SearchResultsView(generic.ListView):
                       vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True),
                       tag_list=GroupConcat('tags__name', distinct=True)) \
             .order_by('-vote_sum', '-create_date') \
-            .values('id', 'header', 'create_date', 'user__username', 'user__userprofile__avatar',
+            .values('id', 'header', 'create_date', 'user__username', 'user__avatar',
                     'answer_cnt', 'vote_sum', 'tag_list')
 
     def get_context_data(self, **kwargs):
@@ -153,7 +152,7 @@ class QuestionDetailView(ListView, FormMixin):
                       current_user_vote=Sum(
                           Case(When(answervote__user_id=user_id, then='answervote__value'), default=0))) \
             .order_by('-vote_sum', 'create_date').values('id', 'content', 'is_correct', 'user__username',
-                                                         'user__userprofile__avatar',
+                                                         'user__avatar',
                                                          'vote_sum', 'current_user_vote')
 
     def get_context_data(self, **kwargs):
@@ -319,57 +318,3 @@ def mark_answer_right(request):
 
     return HttpResponse(value)
 
-
-class SignUpView(generic.CreateView):
-    form_class = SignUpForm
-    template_name = "registration/signup.html"
-
-    def get_success_url(self):
-        redirect_to = self.request.POST['next']
-        return redirect_to
-
-    def get_context_data(self, **kwargs):
-        context = super(SignUpView, self).get_context_data(**kwargs)
-        context.update({'next': self.request.GET.get('next', '')})
-        return context
-
-    def post(self, request, *args, **kwargs):
-        response = super(SignUpView, self).post(request, *args, **kwargs)
-        form = self.get_form()
-
-        if form.is_valid():
-            new_user = form.save()
-            user_profile = new_user.userprofile
-            user_profile.avatar = form.cleaned_data['avatar']
-            user_profile.save()
-
-            login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
-        return response
-
-
-class SettingsView(LoginRequiredMixin, UpdateView):
-    form_class = UserSettings
-    model = UserProfile
-    template_name = 'registration/user_settings.html'
-    # fields = ['avatar']
-
-    def get_success_url(self):
-        redirect_to = self.request.POST['next']
-        return redirect_to
-
-    def get_context_data(self, **kwargs):
-        context = super(SettingsView, self).get_context_data(**kwargs)
-        context.update({'next': self.request.GET.get('next', '')})
-        if self.request.user.userprofile.avatar:
-            context.update({'file_name': os.path.basename(self.request.user.userprofile.avatar.name)})
-        else:
-            context.update({'file_name': ''})
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        response = super(SettingsView, self).post(request, *args, **kwargs)
-        form = self.get_form()
-        request.user.email = form.data['email']
-        request.user.save()
-        return response

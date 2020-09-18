@@ -148,7 +148,7 @@ class SearchViewTest(TestCase):
 class AskQuestionViewTest(TestCase):
     def setUp(self):
         user = User.objects.create_user('user1', 'test@test.com', '12345')
-        user.userprofile.avatar = 'default_avatar.png'
+        user.avatar = 'default_avatar.png'
         user.save()
         self.client.login(username='user1', password='12345')
 
@@ -172,7 +172,7 @@ class QuestionDetailViewTest(TestCase):
         number_of_questions = 3
 
         user = User.objects.create_user('user1', 'test@test.com', '12345')
-        user.userprofile.avatar = 'default_avatar.png'
+        user.avatar = 'default_avatar.png'
         user.save()
         for question_num in range(number_of_questions):
             Question.objects.create(
@@ -214,13 +214,13 @@ class SignUpViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('signup'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'registration/signup.html')
+        self.assertTemplateUsed(response, 'signup.html')
 
 
 class SettingsViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('user1', 'test@test.com', '12345')
-        self.user.userprofile.avatar = 'default_avatar.png'
+        self.user.avatar = 'default_avatar.png'
         self.user.save()
         self.client.login(username='user1', password='12345')
 
@@ -235,5 +235,5 @@ class SettingsViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('settings', args=(self.user.id,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'registration/user_settings.html')
+        self.assertTemplateUsed(response, 'user_settings.html')
 

@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
 
-{% block content %}
+{% block page_content %}
 
 <h1>Setting</h1>
 <form  method="post" enctype="multipart/form-data">
@@ -21,7 +21,7 @@
     <div class="form-group row">
         <label for="avatar" class="col-sm-2 col-form-label">Avatar</label>
         <div class="col-sm-10">
-            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" id="img-preview" width="100" height="100" alt="No image">
+            <img src='{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static user_default_avatar {% endif %}' id="img-preview" width="100" height="100" alt="No image">
 
             <div class="custom-file">
               <input type="file" class="custom-file-input" id="avatar" name="avatar" accept="image/*"  onchange="loadFile(event)">
