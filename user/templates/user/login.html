@@ -1,6 +1,9 @@
 {% extends "base_generic.html" %}
 
 {% block page_content %}
+<div class="container-fluid">
+    <div class="row" >
+        <div class="col-sm-10 ">
 <h2>Log In</h2>
   {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
@@ -30,5 +33,7 @@
     <input class="btn btn-primary" type="submit" value="login" />
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
+        </div>
+    </div>
 
 {% endblock %}

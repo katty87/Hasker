@@ -70,11 +70,12 @@
 
 {% block scripts %}
 <script>
+$(document).ready(
   var loadFile = function(event) {
     if (event.target.files.length > 0) {
         document.getElementById('file_name').innerHTML = event.target.files[0].name
     }
-  };
+  });
 
 </script>
 {% endblock %}
