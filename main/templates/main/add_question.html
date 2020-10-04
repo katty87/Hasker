@@ -40,34 +40,37 @@
 
 {% block scripts %}
   {{ block.super }}
+
+  <script src='{% static "main/js/jquery-ui.min.js" type="text/javascript" %}' charset="utf-8"></script>
+
   <link href='{% static "main/css/jquery.tagit.css" %}' rel="stylesheet" type="text/css">
   <link href='{% static "main/css/tagit.ui-zendesk.css" %}' rel="stylesheet" type="text/css">
 
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-
   <script src='{% static "main/js/tag-it.js" %}' type="text/javascript"></script>
 
+{% endblock %}
+
+{% block js %}
+
 <script>
-    var all_tags = {{ tags|safe }};
+$(document).ready(function () {
+      var all_tags = {{ tags|safe }};
 
-    $(function(){
+      var sampleTags = all_tags;
 
-        var sampleTags = all_tags;
+      var eventTags = $('#eventTags');
 
-        var eventTags = $('#eventTags');
+      var addEvent = function(text) {
+          $('#events_container').append(text + '<br>');
+      };
 
-        var addEvent = function(text) {
-            $('#events_container').append(text + '<br>');
-        };
+      eventTags.tagit({
+          availableTags: sampleTags,
+          singleField: true,
+          caseSensitive: false,
+          tagLimit: 3,
+      });
+});
 
-        eventTags.tagit({
-            availableTags: sampleTags,
-            singleField: true,
-            caseSensitive: false,
-            tagLimit: 3,
-        });
-
-    });
 </script>
 {% endblock %}

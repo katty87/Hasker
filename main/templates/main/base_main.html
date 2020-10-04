@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load static %}
 
 {% block page_content %}
 <br>
@@ -31,5 +32,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{{ block.super }}
+
+<script src='{% static "main/js/jquery.min.js" %}'></script>
 {% endblock %}

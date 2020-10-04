@@ -22,7 +22,7 @@ class Question(models.Model):
 
     def current_user_vote(self, user_id):
         try:
-            return QuestionVote.objects.get(question_id=self.id, user_id=user_id)
+            return QuestionVote.objects.get(question_id=self.id, user_id=user_id).value
         except QuestionVote.DoesNotExist:
             return 0
 

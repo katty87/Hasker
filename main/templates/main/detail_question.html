@@ -6,10 +6,9 @@
 <div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
 <div class="row">
     <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-
-     <div class="fa fa-caret-up" id="up-vote" style="cursor: pointer;color:{% if question_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVote()"></div>
+     <div class="fa fa-caret-up" id="up-vote" style="cursor: pointer;color:{% if question_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px"></div>
      <div id="question-vote">{{ question.vote_sum }}</div>
-     <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVote()"></div>
+     <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" ></div>
 
    </div>
     <div class="col-md-10">
@@ -107,98 +106,101 @@
 
 {% block scripts %}
 {{ block.super }}
+    <script src='{% static "main/js/jquery-ui.min.js" type="text/javascript" %}' charset="utf-8"></script>
+    <link href='{% static "main/css/font-awesome.min.css" %}' rel="stylesheet" type="text/css">
+{% endblock %}
 
+{% block js %}
 <script>
-    function onClickUpVote() {
-        vote(1)
-    }
 
-	function onClickDownVote() {
-        vote(-1);
-    }
+$("#up-vote").click(function() {
+    vote(1)
+});
 
-	function vote(vote_value) {
-        $.ajax({
-            url: '{% url 'vote_question' %}',
-            type: 'POST',
-            data:{question_id: {{ question.id }}, value: vote_value, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
-            success: function(response) {
-                current_vote = response.current_vote
-                if (current_vote == -1) {
-                    document.getElementById("down-vote").style.color = "orange";
+$("#down-vote").click(function() {
+    vote(-1)
+});
+
+function vote(vote_value) {
+    $.ajax({
+        url: '{% url 'vote_question' %}',
+        type: 'POST',
+        data:{question_id: {{ question.id }}, value: vote_value, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function(response) {
+            current_vote = response.current_vote
+            if (current_vote == -1) {
+                document.getElementById("down-vote").style.color = "orange";
+                document.getElementById("up-vote").style.color = "#D3D3D3";
+            } else if (current_vote == 1) {
+                document.getElementById("up-vote").style.color = "orange";
+                document.getElementById("down-vote").style.color = "#D3D3D3";
+            } else if (current_vote == 0) {
+                if (vote_value == 1) {
                     document.getElementById("up-vote").style.color = "#D3D3D3";
-                } else if (current_vote == 1) {
-                    document.getElementById("up-vote").style.color = "orange";
+                } else {
                     document.getElementById("down-vote").style.color = "#D3D3D3";
-                } else if (current_vote == 0) {
-                    if (vote_value == 1) {
-                        document.getElementById("up-vote").style.color = "#D3D3D3";
-                    } else {
-                        document.getElementById("down-vote").style.color = "#D3D3D3";
-                    }
                 }
+            }
 
-                document.getElementById("question-vote").innerHTML = response.total_votes
-            },
-        });
-    }
+            document.getElementById("question-vote").innerHTML = response.total_votes
+        },
+    });
+}
 
-    function onClickUpVoteAnswer(id) {
-        vote_ans(id, 1)
-    }
+function onClickUpVoteAnswer(id) {
+    vote_ans(id, 1)
+}
 
-	function onClickDownVoteAnswer(id) {
-        vote_ans(id, -1)
-    }
+function onClickDownVoteAnswer(id) {
+    vote_ans(id, -1)
+}
 
-	function vote_ans(id, vote_value) {
+function vote_ans(id, vote_value) {
 
-        $.ajax({
-            url: '{% url 'vote_answer' %}',
-            type: 'POST',
-            data:{answer_id: id, value: vote_value, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
-            success: function(response) {
-                current_vote = response.current_vote
-                if (current_vote == -1) {
-                    document.getElementById("down-vote-answer-" + id).style.color = "orange";
+    $.ajax({
+        url: '{% url 'vote_answer' %}',
+        type: 'POST',
+        data:{answer_id: id, value: vote_value, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function(response) {
+            current_vote = response.current_vote
+            if (current_vote == -1) {
+                document.getElementById("down-vote-answer-" + id).style.color = "orange";
+                document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
+            } else if (current_vote == 1) {
+                document.getElementById("up-vote-answer-" + id).style.color = "orange";
+                document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
+            } else if (current_vote == 0) {
+                if (vote_value == 1) {
                     document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
-                } else if (current_vote == 1) {
-                    document.getElementById("up-vote-answer-" + id).style.color = "orange";
+                } else {
                     document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
-                } else if (current_vote == 0) {
-                    if (vote_value == 1) {
-                        document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
-                    } else {
-                        document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
-                    }
                 }
+            }
 
-                document.getElementById("answer-vote-" + id).innerHTML = response.total_votes
-            },
-        });
+            document.getElementById("answer-vote-" + id).innerHTML = response.total_votes
+        },
+    });
 
-    }
+}
 
-    function onClickAnswerRight(id, user_id, author_id) {
-       if (user_id != author_id) {
-        return
-       }
+function onClickAnswerRight(id, user_id, author_id) {
+   if (user_id != author_id) {
+    return
+   }
 
-       $.ajax({
-            url: '{% url 'mark_answer_right' %}',
-            type: 'POST',
-            data:{answer_id: id, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
-            success: function(response) {
-                if (response == 1) {
-                    document.getElementById("answer-right-" + id).innerHTML = '&#9733;';
-                } else if (response == 0) {
-                    document.getElementById("answer-right-" + id).innerHTML = '&#9734;';
-                }
-            },
-        });
+   $.ajax({
+        url: '{% url 'mark_answer_right' %}',
+        type: 'POST',
+        data:{answer_id: id, user_id: {{ user.id }}, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function(response) {
+            if (response == 1) {
+                document.getElementById("answer-right-" + id).innerHTML = '&#9733;';
+            } else if (response == 0) {
+                document.getElementById("answer-right-" + id).innerHTML = '&#9734;';
+            }
+        },
+    });
+}
 
-
-    }
 </script>
-
 {% endblock %}
