@@ -15,7 +15,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 from main.aggregates_extension import GroupConcat
@@ -96,42 +97,37 @@ class SearchResultsView(generic.ListView):
         return context
 
 
-@login_required
-def ask_view(request):
-    question_instance = Question()
+class AskQuestionView(LoginRequiredMixin, CreateView):
+    model = Question
+    template_name = 'main/add_question.html'
+    # fields = ['header', 'content']
+    form_class = AddQuestionForm
 
-    if request.method == 'POST':
-        form = AddQuestionForm(request.POST)
-        if form.is_valid():
-            question_instance.header = form.cleaned_data['title']
-            question_instance.content = form.cleaned_data['content']
-            question_instance.create_date = datetime.utcnow()
-            question_instance.user = request.user
+    def form_valid(self, form):
+        question_instance = form.save(commit=False)
+
+        question_instance.create_date = datetime.utcnow()
+        question_instance.user = self.request.user
+        question_instance.save()
+
+        tags = form.data['tags'].split(',')
+        for tag_name in tags:
+            tag = Tag.objects.filter(name=tag_name).first()
+            if not tag:
+                tag = Tag()
+                tag.name = tag_name
+                tag.save()
+            question_instance.tags.add(tag)
+
+        if tags:
             question_instance.save()
 
-            tags = form.data['tags'].split(',')
-            for tag_name in tags:
-                tag = Tag.objects.filter(name=tag_name).first()
-                if not tag:
-                    tag = Tag()
-                    tag.name = tag_name
-                    tag.save()
-                question_instance.tags.add(tag)
+        return redirect('question_detail', pk=question_instance.id)
 
-            if tags:
-                question_instance.save()
-
-            return redirect('question_detail', pk=question_instance.id)
-    else:
-        form = AddQuestionForm()
-
-    context = {
-        'form': form,
-        'question_instance': question_instance,
-        'tags': json.dumps(list(Tag.objects.all().values_list('name', flat=True)))
-    }
-
-    return render(request, 'main/add_question.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] = json.dumps(list(Tag.objects.all().values_list('name', flat=True)))
+        return context
 
 
 class QuestionDetailView(ListView, FormMixin):

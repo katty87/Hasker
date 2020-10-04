@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^ask$', views.ask_view, name='ask'),
+    url(r'^ask$', views.AskQuestionView.as_view(), name='ask'),
     url(r'^question/(?P<pk>[0-9]+)/$', views.QuestionDetailView.as_view(), name='question_detail'),
     url(r'^question/(?P<pk>[0-9]+)/answer/$', views.answer_question, name='answer_question'),
     url(r'^search$', views.SearchResultsView.as_view(), name='search_results'),

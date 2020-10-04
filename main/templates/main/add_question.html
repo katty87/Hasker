@@ -2,17 +2,16 @@
 {% load static %}
 
 {% block content %}
-
   <h2>Ask a question</h2>
   <br>
   <form class="form" method="post">
     {% csrf_token %}
     {{ form.non_field_errors }}
     <div class="form-group row">
-      <label for="title" class="col-sm-2 col-form-label">Title</label>
+      <label for="header" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="title" name="title" value="{{ form.title.value|default_if_none:''  }}">
-        <p style="color: red">{{ form.title.errors.as_text }}</p>
+        <input type="text" class="form-control" id="header" name="header" value="{{ form.header.value|default_if_none:''  }}">
+        <p style="color: red">{{ form.header.errors.as_text }}</p>
       </div>
     </div>
 
@@ -41,35 +40,34 @@
 
 {% block scripts %}
   {{ block.super }}
-
   <link href='{% static "main/css/jquery.tagit.css" %}' rel="stylesheet" type="text/css">
   <link href='{% static "main/css/tagit.ui-zendesk.css" %}' rel="stylesheet" type="text/css">
 
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 
   <script src='{% static "main/js/tag-it.js" %}' type="text/javascript"></script>
 
+<script>
+    var all_tags = {{ tags|safe }};
 
-  <script>
-      var all_tags = {{ tags|safe }};
+    $(function(){
 
-      $(function(){
+        var sampleTags = all_tags;
 
-          var sampleTags = all_tags;
+        var eventTags = $('#eventTags');
 
-          var eventTags = $('#eventTags');
+        var addEvent = function(text) {
+            $('#events_container').append(text + '<br>');
+        };
 
-          var addEvent = function(text) {
-              $('#events_container').append(text + '<br>');
-          };
+        eventTags.tagit({
+            availableTags: sampleTags,
+            singleField: true,
+            caseSensitive: false,
+            tagLimit: 3,
+        });
 
-          eventTags.tagit({
-              availableTags: sampleTags,
-              singleField: true,
-              caseSensitive: false,
-              tagLimit: 3,
-          });
-
-      });
-  </script>
+    });
+</script>
 {% endblock %}

@@ -1,9 +1,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from main.models import Question
 
-class AddQuestionForm(forms.Form):
-    title = forms.CharField(max_length=256, required=True)
+
+class AddQuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ('header', 'content')
+
+    header = forms.CharField(max_length=256, required=True)
     content = forms.CharField(max_length=4096, required=True)
 
     error_css_class = 'error'
@@ -11,7 +17,7 @@ class AddQuestionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(AddQuestionForm, self).__init__(*args, **kwargs)
-        self.fields['title'].error_messages = {'required': 'Title is missing.'}
+        self.fields['header'].error_messages = {'required': 'Title is missing.'}
         self.fields['content'].error_messages = {'required': 'Body is missing.'}
 
     def clean_content(self):
