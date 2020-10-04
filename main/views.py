@@ -13,7 +13,6 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
-from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,6 +22,7 @@ from main.aggregates_extension import GroupConcat
 from main.forms import AddQuestionForm, QuestionDetailForm
 from main.models import Question, QuestionVote, Answer, AnswerVote, Tag
 from user.models import User
+from Hasker.settings.base import EMAIL_HOST_USER
 
 
 class IndexView(generic.ListView):
@@ -185,7 +185,7 @@ class QuestionDetailView(ListView, FormMixin):
             send_mail(
                 'Hasker: new answer to your question',
                 '',
-                settings.EMAIL_HOST_USER,
+                EMAIL_HOST_USER,
                 [question.user.email],
                 fail_silently=True,
                 html_message=
@@ -197,38 +197,6 @@ class QuestionDetailView(ListView, FormMixin):
             return redirect('question_detail', pk=question.id)
 
         return self.get(request, *args, **kwargs)
-
-
-@login_required
-@require_http_methods(['POST'])
-def answer_question(request, pk):
-    question = get_object_or_404(Question, pk=pk)
-
-    form = QuestionDetailForm(request.POST)
-
-    if form.is_valid():
-        answer = Answer()
-        answer.content = request.POST['answer_text']
-        answer.question = question
-        answer.create_date = datetime.utcnow()
-        answer.is_correct = False
-        answer.user = request.user
-        answer.save()
-
-        send_mail(
-            'Hasker: new answer to your question',
-            '',
-            EMAIL_HOST_USER,
-            [question.user.email],
-            fail_silently=True,
-            html_message=
-            '<!DOCTYPE html><html><body>You have got a new answer to your question.\n '
-            'If you would like to see it please click '
-            '<a href="{full_url}">{full_url}</a>'
-            '</body></html>'.format(full_url=request.META['HTTP_REFERER'])
-        )
-
-    return redirect('question_detail', pk=question.id)
 
 
 @login_required

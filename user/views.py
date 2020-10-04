@@ -23,16 +23,14 @@ class SignUpView(generic.CreateView):
         context.update({'next': self.request.GET.get('next', '')})
         return context
 
-    def post(self, request, *args, **kwargs):
-        response = super(SignUpView, self).post(request, *args, **kwargs)
-        form = self.get_form()
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        new_user = form.save()
+        new_user.avatar = form.cleaned_data['avatar']
+        new_user.save()
 
-        if form.is_valid():
-            new_user = form.save()
-            new_user.avatar = form.cleaned_data['avatar']
-            new_user.save()
+        login(self.request, new_user, 'django.contrib.auth.backends.ModelBackend')
 
-            login(request, new_user, 'django.contrib.auth.backends.ModelBackend')
         return response
 
 
@@ -55,12 +53,11 @@ class SettingsView(LoginRequiredMixin, UpdateView):
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        response = super(SettingsView, self).post(request, *args, **kwargs)
-        form = self.get_form()
-        if form.is_valid():
-            request.user.email = form.data['email']
-            if form.data['avatar']:
-                request.user.avatar = form.data['avatar']
-            request.user.save()
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.request.user.email = form.data['email']
+        if form.cleaned_data['avatar']:
+            self.request.user.avatar = form.cleaned_data['avatar']
+        self.request.user.save()
+
         return response
