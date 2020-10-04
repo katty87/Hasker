@@ -40,7 +40,6 @@ class SettingsView(LoginRequiredMixin, UpdateView):
     form_class = UserSettings
     model = User
     template_name = 'user/user_settings.html'
-    # fields = ['avatar']
 
     def get_success_url(self):
         redirect_to = self.request.POST['next']

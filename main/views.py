@@ -100,7 +100,6 @@ class SearchResultsView(generic.ListView):
 class AskQuestionView(LoginRequiredMixin, CreateView):
     model = Question
     template_name = 'main/add_question.html'
-    # fields = ['header', 'content']
     form_class = AddQuestionForm
 
     def form_valid(self, form):
@@ -162,8 +161,8 @@ class QuestionDetailView(ListView, FormMixin):
 
         if pk:
             question = get_object_or_404(Question, pk=pk)
-            context.update({'question_vote': question.current_user_vote(user_id)})
-            context.update({'question': question})
+            context['question_vote'] = question.current_user_vote(user_id)
+            context['question'] = question
 
         return context
 
