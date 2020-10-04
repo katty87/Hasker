@@ -21,7 +21,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from main.aggregates_extension import GroupConcat
 from main.forms import AddQuestionForm, QuestionDetailForm
 from main.models import Question, QuestionVote, Answer, AnswerVote, Tag
-from user.models import User
+from user.models import UserProfile
 from Hasker.settings.base import EMAIL_HOST_USER
 
 
@@ -207,8 +207,8 @@ def vote_question(request):
 
     try:
         question = Question.objects.get(pk=question_id)
-        user = User.objects.get(pk=user_id)
-    except (User.DoesNotExist, Question.DoesNotExist) as e:
+        user = UserProfile.objects.get(pk=user_id)
+    except (UserProfile.DoesNotExist, Question.DoesNotExist) as e:
         return HttpResponse(0)
 
     try:
@@ -240,8 +240,8 @@ def vote_answer(request):
 
     try:
         answer = Answer.objects.get(pk=answer_id)
-        user = User.objects.get(pk=user_id)
-    except (User.DoesNotExist, Answer.DoesNotExist) as e:
+        user = UserProfile.objects.get(pk=user_id)
+    except (UserProfile.DoesNotExist, Answer.DoesNotExist) as e:
         return HttpResponse(0)
 
     try:
@@ -269,7 +269,7 @@ def mark_answer_right(request):
 
     try:
         answer = Answer.objects.get(pk=answer_id)
-    except (User.DoesNotExist, Answer.DoesNotExist) as e:
+    except (UserProfile.DoesNotExist, Answer.DoesNotExist) as e:
         return HttpResponse(-1)
 
     if answer.question.user.id != int(user_id):

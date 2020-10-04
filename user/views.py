@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
 
 from user.forms import SignUpForm, UserSettings
-from user.models import User
+from user.models import UserProfile
 
 
 class SignUpView(generic.CreateView):
@@ -36,7 +36,7 @@ class SignUpView(generic.CreateView):
 
 class SettingsView(LoginRequiredMixin, UpdateView):
     form_class = UserSettings
-    model = User
+    model = UserProfile
     template_name = 'user/user_settings.html'
 
     def get_success_url(self):

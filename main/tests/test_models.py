@@ -2,29 +2,29 @@ from django.test import TestCase
 from datetime import datetime
 
 from main.models import Question, QuestionVote, Answer, AnswerVote
-from django.contrib.auth.models import User
+from user.models import UserProfile
 
 
 class QuestionModelTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         Question.objects.create(header='How to ...?', content='Some text', create_date=datetime.now(),
-                                    user=user)
+                                user=user)
 
-        User.objects.create_user('user2', 'test2@test.com', '12345')
-        User.objects.create_user('user3', 'test3@test.com', '12345')
-        User.objects.create_user('user4', 'test4@test.com', '12345')
+        UserProfile.objects.create_user('user2', 'test2@test.com', '12345')
+        UserProfile.objects.create_user('user3', 'test3@test.com', '12345')
+        UserProfile.objects.create_user('user4', 'test4@test.com', '12345')
 
     def test_no_votes_sum(self):
-        user1 = User.objects.get(username='user1')
+        user1 = UserProfile.objects.get(username='user1')
         question = Question.objects.filter(user=user1).first()
         self.assertEqual(question.vote_sum(), 0)
 
     def test_cancel_vote_sum(self):
-        user1 = User.objects.get(username='user1')
+        user1 = UserProfile.objects.get(username='user1')
         question = Question.objects.filter(user=user1).first()
-        user = User.objects.get(username='user2')
+        user = UserProfile.objects.get(username='user2')
 
         question_vote = QuestionVote()
         question_vote.question = question
@@ -38,11 +38,11 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), 0)
 
     def test_below_zero_vote_sum(self):
-        user1 = User.objects.get(username='user1')
+        user1 = UserProfile.objects.get(username='user1')
         question = Question.objects.filter(user=user1).first()
-        user2 = User.objects.get(username='user2')
-        user3 = User.objects.get(username='user3')
-        user4 = User.objects.get(username='user4')
+        user2 = UserProfile.objects.get(username='user2')
+        user3 = UserProfile.objects.get(username='user3')
+        user4 = UserProfile.objects.get(username='user4')
 
         vote_question(question, user2, -1)
         vote_question(question, user3, -1)
@@ -51,11 +51,11 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), -1)
 
     def test_above_zero_vote_sum(self):
-        user1 = User.objects.get(username='user1')
+        user1 = UserProfile.objects.get(username='user1')
         question = Question.objects.filter(user=user1).first()
-        user2 = User.objects.get(username='user2')
-        user3 = User.objects.get(username='user3')
-        user4 = User.objects.get(username='user4')
+        user2 = UserProfile.objects.get(username='user2')
+        user3 = UserProfile.objects.get(username='user3')
+        user4 = UserProfile.objects.get(username='user4')
 
         vote_question(question, user2, 1)
         vote_question(question, user3, -1)
@@ -64,9 +64,9 @@ class QuestionModelTests(TestCase):
         self.assertEqual(question.vote_sum(), 1)
 
     def test_current_user_vote(self):
-        user1 = User.objects.get(username='user1')
+        user1 = UserProfile.objects.get(username='user1')
         question = Question.objects.filter(user=user1).first()
-        user = User.objects.get(username='user2')
+        user = UserProfile.objects.get(username='user2')
 
         vote_question(question, user, 1)
         self.assertEqual(question.current_user_vote(user.id), 1)
@@ -83,7 +83,7 @@ def vote_question(question, user, value):
 class AnswerModelTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         question = Question.objects.create(header='How to install Django?',
                                            content="I'm trying to setup a Django project...",
                                            create_date=datetime.now(),
@@ -91,9 +91,9 @@ class AnswerModelTests(TestCase):
 
         Answer.objects.create(content="Use pip install Django.", question=question, user=user,
                               create_date=datetime.now(), is_correct=0)
-        User.objects.create_user('user2', 'test2@test.com', '12345')
-        User.objects.create_user('user3', 'test3@test.com', '12345')
-        User.objects.create_user('user4', 'test4@test.com', '12345')
+        UserProfile.objects.create_user('user2', 'test2@test.com', '12345')
+        UserProfile.objects.create_user('user3', 'test3@test.com', '12345')
+        UserProfile.objects.create_user('user4', 'test4@test.com', '12345')
 
     def test_no_votes_sum(self):
         answer = Answer.objects.get(id=1)
@@ -101,7 +101,7 @@ class AnswerModelTests(TestCase):
 
     def test_cancel_vote_sum(self):
         answer = Answer.objects.get(id=1)
-        user = User.objects.get(username='user2')
+        user = UserProfile.objects.get(username='user2')
 
         answer_vote = AnswerVote()
         answer_vote.answer = answer
@@ -116,9 +116,9 @@ class AnswerModelTests(TestCase):
 
     def test_below_zero_vote_sum(self):
         answer = Answer.objects.get(id=1)
-        user2 = User.objects.get(username='user2')
-        user3 = User.objects.get(username='user3')
-        user4 = User.objects.get(username='user4')
+        user2 = UserProfile.objects.get(username='user2')
+        user3 = UserProfile.objects.get(username='user3')
+        user4 = UserProfile.objects.get(username='user4')
 
         vote_answer(answer, user2, -1)
         vote_answer(answer, user3, -1)
@@ -128,9 +128,9 @@ class AnswerModelTests(TestCase):
 
     def test_above_zero_vote_sum(self):
         answer = Answer.objects.get(id=1)
-        user2 = User.objects.get(username='user2')
-        user3 = User.objects.get(username='user3')
-        user4 = User.objects.get(username='user4')
+        user2 = UserProfile.objects.get(username='user2')
+        user3 = UserProfile.objects.get(username='user3')
+        user4 = UserProfile.objects.get(username='user4')
 
         vote_answer(answer, user2, 1)
         vote_answer(answer, user3, -1)
@@ -140,7 +140,7 @@ class AnswerModelTests(TestCase):
 
     def test_current_user_vote(self):
         answer = Answer.objects.get(id=1)
-        user = User.objects.get(username='user2')
+        user = UserProfile.objects.get(username='user2')
 
         vote_answer(answer, user, 1)
         self.assertEqual(answer.current_user_vote(user.id), 1)

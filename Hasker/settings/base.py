@@ -73,7 +73,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.UserProfile'
 
 LANGUAGE_CODE = 'en-us'
 

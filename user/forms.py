@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.files.images import get_image_dimensions
 from django.core.exceptions import ValidationError
 
-from user.models import User
+from user.models import UserProfile
 
 
 def check_avatar(avatar):
@@ -21,7 +21,7 @@ class SignUpForm(UserCreationForm):
     avatar = forms.ImageField(help_text='Load picture up to 1MB', required=False)
 
     class Meta:
-        model = User
+        model = UserProfile
         fields = ('username', 'password1', 'password2', 'email', 'avatar')
 
     def clean_avatar(self):
@@ -44,7 +44,7 @@ class UserSettings(forms.ModelForm):
     avatar = forms.ImageField(help_text='Load picture up to 1MB', required=False)
 
     class Meta:
-        model = User
+        model = UserProfile
         fields = ('email', 'avatar')
 
     def clean_avatar(self):

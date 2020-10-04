@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum
 
 
-from user.models import User
+from user.models import UserProfile
 
 
 class Tag(models.Model):
@@ -12,7 +12,7 @@ class Tag(models.Model):
 class Question(models.Model):
     header = models.CharField(max_length=256)
     content = models.CharField(max_length=4096)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_author')
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='question_author')
     create_date = models.DateTimeField()
     tags = models.ManyToManyField(Tag)
 
@@ -30,7 +30,7 @@ class Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.CharField(max_length=4096)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answer_author')
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='answer_author')
     create_date = models.DateTimeField()
     is_correct = models.BooleanField()
 
@@ -46,7 +46,7 @@ class Answer(models.Model):
 
 
 class BaseVote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     value = models.IntegerField(default=0)
 
 
