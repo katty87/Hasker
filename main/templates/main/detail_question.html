@@ -1,14 +1,33 @@
 {% extends "main/base_main.html" %}
 {% load static %}
 
+{% block links %}
+{{ block.super }}
+    <link href='{% static "main/css/font-awesome.min.css" %}' rel="stylesheet" type="text/css">
+
+    <style>
+        .vote {
+            font-size: 36px;
+            cursor: pointer;
+            color: #D3D3D3;
+        }
+
+        .active-vote {
+            font-size: 36px;
+            cursor: pointer;
+            color: orange;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 
-<div style="margin-left: 40px;"><h3>{{ question.header }}</h3></div>
+<h3 class="question-header">{{ question.header }}</h3>
 <div class="row">
-    <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-     <div class="fa fa-caret-up" id="up-vote" style="cursor: pointer;color:{% if question_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px"></div>
+    <div class="col-md-1 vote-sum" align="right">
+     <i class="fa fa-caret-up {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" id="up-vote"></i>
      <div id="question-vote">{{ question.vote_sum }}</div>
-     <div class="fa fa-caret-down" id="down-vote" style="cursor: pointer;color:{% if question_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" ></div>
+     <div class="fa fa-caret-down {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" id="down-vote" ></div>
 
    </div>
     <div class="col-md-10">
@@ -20,7 +39,7 @@
        {% endfor %}
        <div align="right">
             <img src="{% if question.user.avatar %}{{ question.user.avatar.url}} {% else %} {{ static_img_url }}default_avatar.png {% endif %}" width="50" height="50" class="right"  alt="no image">
-           <div style="float:right;width:75px;text-align: left;">    {{ question.user.username }}</div>
+           <div class="question_username"> {{ question.user.username }}</div>
        </div>
    </div>
 </div>
@@ -28,18 +47,19 @@
 
 {% load main_filters %}
 {% for answer in answer_list %}
+<input type="hidden" id="answer_list" name="variable" value="{{ answer_list }}">
 <div class="row">
-    <div class="col-md-1" style="font-size: 1em; color: #606060;" align="right">
-        <div class="fa fa-caret-up" id="up-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer.current_user_vote == 1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
+    <div class="col-md-1 vote-sum" align="right">
+        <div class="fa fa-caret-up {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" name="up-vote-answer-{{ answer.id }}" id="{{ answer.id }}" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
         <div id="answer-vote-{{ answer.id }}">{{ answer.vote_sum }}</div>
-        <div class="fa fa-caret-down"  id="down-vote-answer-{{ answer.id }}" style="cursor: pointer;color:{% if answer.current_user_vote == -1 %}orange{% else %}#D3D3D3{% endif %};font-size:36px" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
-        <p style="{% if user.id == question.user.id %} cursor:pointer;color:black{% else %}cursor:default;color:#D3D3D3{% endif %};font-size:20px" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
+        <div class="fa fa-caret-down {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}"  id="down-vote-answer-{{ answer.id }}" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
+        <p class="{% if user.id == question.user.id %} answer-owner-mark {% else %} anser-mark {% endif %}" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
     </div>
     <div class="col-md-10">
         <p>{{ answer.content|linebreaks  }}</p>
         <div align="right">
             <img src="{% if answer.user__avatar %}{{ media_url }}{{ answer.user__avatar }}{% else %}{{ static_img_url }}default_avatar.png{% endif %}" width="50" height="50" class="right"  alt="no image">
-           <div style="float:right;width:75px;text-align: left;">    {{ answer.user__username }}</div>
+           <div class="question_username"> {{ answer.user__username }}</div>
         </div>
     </div>
 </div>
@@ -83,7 +103,7 @@
     <div class="form-group">
         <label for="answer_text"><b>Your answer</b></label>
         <textarea class="form-control" name="answer_text" id="answer_text" rows="3"></textarea>
-        <p style="color: red">{{ form.answer_text.errors.as_text }}</p>
+        <p class="error">{{ form.answer_text.errors.as_text }}</p>
     </div>
 
     <div class="button">
@@ -107,13 +127,23 @@
 {% block scripts %}
 {{ block.super }}
     <script src='{% static "main/js/jquery-ui.min.js" type="text/javascript" %}' charset="utf-8"></script>
-    <link href='{% static "main/css/font-awesome.min.css" %}' rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block js %}
 <script>
+$(document).ready(function () {
 
 $("#up-vote").click(function() {
+  var divs = document.getElementsByTagName("div");
+  for (i = 0 ; i < divs.length ; i++) {
+    itemName = divs[i].getAttribute("name")
+    if ( (itemName != null) && (itemName.indexOf("up-vote-answer-") == 0) ) {
+        divs[i].click(function() {
+            vote_ans(id, 1)
+        });
+    }
+  }
+
     vote(1)
 });
 
@@ -129,16 +159,25 @@ function vote(vote_value) {
         success: function(response) {
             current_vote = response.current_vote
             if (current_vote == -1) {
-                document.getElementById("down-vote").style.color = "orange";
-                document.getElementById("up-vote").style.color = "#D3D3D3";
+                document.getElementById("down-vote").classList.remove("vote");
+                document.getElementById("down-vote").classList.add("active-vote");
+
+                document.getElementById("up-vote").classList.remove("active-vote");
+                document.getElementById("up-vote").classList.add("vote");
             } else if (current_vote == 1) {
-                document.getElementById("up-vote").style.color = "orange";
-                document.getElementById("down-vote").style.color = "#D3D3D3";
+                document.getElementById("up-vote").classList.remove("vote");
+                document.getElementById("up-vote").classList.add("active-vote");
+
+                document.getElementById("down-vote").classList.remove("active-vote");
+                document.getElementById("down-vote").classList.add("vote");
+
             } else if (current_vote == 0) {
                 if (vote_value == 1) {
-                    document.getElementById("up-vote").style.color = "#D3D3D3";
+                    document.getElementById("up-vote").classList.remove("active-vote");
+                    document.getElementById("up-vote").classList.add("vote");
                 } else {
-                    document.getElementById("down-vote").style.color = "#D3D3D3";
+                    document.getElementById("down-vote").classList.remove("active-vote");
+                    document.getElementById("down-vote").classList.add("vote");
                 }
             }
 
@@ -164,16 +203,16 @@ function vote_ans(id, vote_value) {
         success: function(response) {
             current_vote = response.current_vote
             if (current_vote == -1) {
-                document.getElementById("down-vote-answer-" + id).style.color = "orange";
-                document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
+                document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down active-vote";
+                document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up vote";
             } else if (current_vote == 1) {
-                document.getElementById("up-vote-answer-" + id).style.color = "orange";
-                document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
+                document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up active-vote";
+                document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down vote";
             } else if (current_vote == 0) {
                 if (vote_value == 1) {
-                    document.getElementById("up-vote-answer-" + id).style.color = "#D3D3D3";
+                    document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up vote";
                 } else {
-                    document.getElementById("down-vote-answer-" + id).style.color = "#D3D3D3";
+                    document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down vote";
                 }
             }
 
@@ -202,5 +241,6 @@ function onClickAnswerRight(id, user_id, author_id) {
     });
 }
 
+});
 </script>
 {% endblock %}

@@ -1,0 +1,33 @@
+
+.question-header {
+  margin-left: 40px;
+}
+
+.vote-sum {
+    font-size: 1em;
+    color: #606060;
+}
+
+
+
+.question_username {
+    float:right;
+    width:75px;
+    text-align: left;
+}
+
+.answer-mark {
+    font-size:20px;
+    cursor:default;
+    color:#D3D3D3;
+}
+
+.answer-owner-mark {
+    .answer-mark
+    cursor:pointer;
+    color:black;
+}
+
+.error {
+    color:red;
+}
