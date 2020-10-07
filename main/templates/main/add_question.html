@@ -11,7 +11,7 @@
       <label for="header" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" id="header" name="header" value="{{ form.header.value|default_if_none:''  }}">
-        <p style="color: red">{{ form.header.errors.as_text }}</p>
+        <p class="error">{{ form.header.errors.as_text }}</p>
       </div>
     </div>
 

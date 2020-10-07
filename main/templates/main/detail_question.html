@@ -27,7 +27,7 @@
     <div class="col-md-1 vote-sum" align="right">
      <i class="fa fa-caret-up {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" id="up-vote"></i>
      <div id="question-vote">{{ question.vote_sum }}</div>
-     <div class="fa fa-caret-down {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" id="down-vote" ></div>
+     <div class="fa fa-caret-down {% if question_vote == -1 %}active-vote{% else %}vote{% endif %}" id="down-vote" ></div>
 
    </div>
     <div class="col-md-10">
@@ -50,9 +50,9 @@
 <input type="hidden" id="answer_list" name="variable" value="{{ answer_list }}">
 <div class="row">
     <div class="col-md-1 vote-sum" align="right">
-        <div class="fa fa-caret-up {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}" name="up-vote-answer-{{ answer.id }}" id="{{ answer.id }}" onclick="onClickUpVoteAnswer({{ answer.id }})"></div>
+        <div class="fa fa-caret-up {% if answer.current_user_vote == 1 %}active-vote{% else %}vote{% endif %}" id="up-vote-answer-{{ answer.id }}" name="{{ answer.id }}"></div>
         <div id="answer-vote-{{ answer.id }}">{{ answer.vote_sum }}</div>
-        <div class="fa fa-caret-down {% if question_vote == 1 %}active-vote{% else %}vote{% endif %}"  id="down-vote-answer-{{ answer.id }}" onclick="onClickDownVoteAnswer({{ answer.id }})"></div>
+        <div class="fa fa-caret-down {% if answer.current_user_vote == -1 %}active-vote{% else %}vote{% endif %}"  id="down-vote-answer-{{ answer.id }}" name="{{ answer.id }}" ></div>
         <p class="{% if user.id == question.user.id %} answer-owner-mark {% else %} anser-mark {% endif %}" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
     </div>
     <div class="col-md-10">
@@ -133,17 +133,26 @@
 <script>
 $(document).ready(function () {
 
-$("#up-vote").click(function() {
   var divs = document.getElementsByTagName("div");
   for (i = 0 ; i < divs.length ; i++) {
-    itemName = divs[i].getAttribute("name")
+    itemName = divs[i].getAttribute("id")
+
     if ( (itemName != null) && (itemName.indexOf("up-vote-answer-") == 0) ) {
-        divs[i].click(function() {
-            vote_ans(id, 1)
+        $("#" + divs[i].getAttribute("id")).click(function() {
+           vote_ans(document.getElementById(this.id).getAttribute("name"), 1);
+        });
+    }
+
+    if ( (itemName != null) && (itemName.indexOf("down-vote-answer-") == 0) ) {
+        $("#" + divs[i].getAttribute("id")).click(function() {
+            vote_ans(document.getElementById(this.id).getAttribute("name"), -1);
         });
     }
   }
 
+
+
+$("#up-vote").click(function() {
     vote(1)
 });
 
@@ -195,7 +204,6 @@ function onClickDownVoteAnswer(id) {
 }
 
 function vote_ans(id, vote_value) {
-
     $.ajax({
         url: '{% url 'vote_answer' %}',
         type: 'POST',
@@ -203,16 +211,25 @@ function vote_ans(id, vote_value) {
         success: function(response) {
             current_vote = response.current_vote
             if (current_vote == -1) {
-                document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down active-vote";
-                document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up vote";
+                document.getElementById("down-vote-answer-" + id).classList.remove("vote");
+                document.getElementById("down-vote-answer-" + id).classList.add("active-vote");
+
+                document.getElementById("up-vote-answer-" + id).classList.remove("active-vote");
+                document.getElementById("up-vote-answer-" + id).classList.add("vote");
+
             } else if (current_vote == 1) {
-                document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up active-vote";
-                document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down vote";
+                document.getElementById("up-vote-answer-" + id).classList.remove("vote");
+                document.getElementById("up-vote-answer-" + id).classList.add("active-vote");
+
+                document.getElementById("down-vote-answer-" + id).classList.remove("active-vote");
+                document.getElementById("down-vote-answer-" + id).classList.add("vote");
             } else if (current_vote == 0) {
                 if (vote_value == 1) {
-                    document.getElementById("up-vote-answer-" + id).class = "fa fa-caret-up vote";
+                    document.getElementById("up-vote-answer-" + id).classList.remove("active-vote");
+                    document.getElementById("up-vote-answer-" + id).classList.add("vote");
                 } else {
-                    document.getElementById("down-vote-answer-" + id).class = "fa fa-caret-down vote";
+                    document.getElementById("down-vote-answer-" + id).classList.remove("active-vote");
+                    document.getElementById("down-vote-answer-" + id).classList.add("vote");
                 }
             }
 
