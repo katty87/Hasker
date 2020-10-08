@@ -3,7 +3,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.urls import reverse
 
-from main.models import Question, User, Tag
+from main.models import Question, Tag
 
 
 class IndexViewTest(TestCase):
@@ -11,7 +11,7 @@ class IndexViewTest(TestCase):
     def setUpTestData(cls):
         number_of_questions = 23
 
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         for question_num in range(number_of_questions):
             Question.objects.create(
                 header='How to do thing #{}?'.format(question_num),
@@ -50,7 +50,7 @@ class IndexViewTest(TestCase):
 class SearchViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         question_instance = Question.objects.create(
             header='How to create first Django app?',
             content='I am new at programming. Can anybody recommend me Django tutorial?',
@@ -147,7 +147,7 @@ class SearchViewTest(TestCase):
 
 class AskQuestionViewTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         user.avatar = 'default_avatar.png'
         user.save()
         self.client.login(username='user1', password='12345')
@@ -171,7 +171,7 @@ class QuestionDetailViewTest(TestCase):
     def setUpTestData(cls):
         number_of_questions = 3
 
-        user = User.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
         user.avatar = 'default_avatar.png'
         user.save()
         for question_num in range(number_of_questions):
@@ -202,38 +202,8 @@ class QuestionDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class SignUpViewTest(TestCase):
-    def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/main/signup')
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('signup'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('signup'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'signup.html')
 
 
-class SettingsViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user('user1', 'test@test.com', '12345')
-        self.user.avatar = 'default_avatar.png'
-        self.user.save()
-        self.client.login(username='user1', password='12345')
 
-    def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/main/settings/{}/'.format(self.user.id))
-        self.assertEqual(response.status_code, 200)
 
-    def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('settings', args=(self.user.id,)))
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('settings', args=(self.user.id,)))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_settings.html')
 

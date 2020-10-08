@@ -40,7 +40,7 @@ class Answer(models.Model):
 
     def current_user_vote(self, user_id):
         try:
-            return AnswerVote.objects.get(answer_id=self.id, user_id=user_id)
+            return AnswerVote.objects.get(answer_id=self.id, user_id=user_id).value
         except AnswerVote.DoesNotExist:
             return 0
 

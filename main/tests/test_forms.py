@@ -1,18 +1,6 @@
 from django.test import TestCase
 
-from main.forms import SignUpForm, UserSettings, AddQuestionForm, QuestionDetailForm
-
-
-class SignUpFormTest(TestCase):
-    def test_signup_form_avatar_help_text(self):
-        form = SignUpForm()
-        self.assertEqual(form.fields['avatar'].help_text, 'Load picture up to 1MB')
-
-
-class UserSettingsFormTest(TestCase):
-    def test_signup_form_avatar_help_text(self):
-        form = UserSettings()
-        self.assertEqual(form.fields['avatar'].help_text, 'Load picture up to 1MB')
+from main.forms import AddQuestionForm, QuestionDetailForm
 
 
 class AddQuestionFormTest(TestCase):
