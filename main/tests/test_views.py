@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from main.models import Question, Tag
+from user.models import UserProfile
 
 
 class IndexViewTest(TestCase):

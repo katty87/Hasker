@@ -6,7 +6,7 @@ from user.models import UserProfile
 
 class SignUpViewTest(TestCase):
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/main/signup')
+        response = self.client.get('/user/signup')
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -16,7 +16,7 @@ class SignUpViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('signup'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'signup.html')
+        self.assertTemplateUsed(response, 'user/signup.html')
 
 
 class SettingsViewTest(TestCase):
@@ -37,4 +37,4 @@ class SettingsViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('settings', args=(self.user.id,)))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_settings.html')
+        self.assertTemplateUsed(response, 'user/user_settings.html')
