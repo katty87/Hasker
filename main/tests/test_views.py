@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.test import TestCase
 from django.urls import reverse
 
-from main.models import Question, Tag
+from main.models import Question
 from user.tests.fixtures import UserFactory
 from main.tests.fixtures import QuestionFactory, TagFactory
 
@@ -11,7 +11,11 @@ from main.tests.fixtures import QuestionFactory, TagFactory
 class IndexViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        QuestionFactory.create_batch(23)
+        QuestionFactory.create_batch(20)
+        yesterday = datetime.now() - timedelta(days=1)
+        QuestionFactory.create(header="yesterday question", create_date=yesterday)
+        QuestionFactory.create(header="yesterday question", create_date=yesterday)
+        QuestionFactory.create(header="yesterday question", create_date=yesterday)
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get('/main/')
@@ -39,6 +43,9 @@ class IndexViewTest(TestCase):
         self.assertTrue('is_paginated' in response.context)
         self.assertTrue(response.context['is_paginated'])
         self.assertTrue(len(response.context['question_list']) == 3)
+
+        for question in response.context_data['question_list'].all():
+            self.assertEqual(question["header"], "yesterday question")
 
 
 class SearchViewTest(TestCase):
@@ -154,3 +161,8 @@ class QuestionDetailViewTest(TestCase):
     def test_view_incorrect_question_id(self):
         response = self.client.get(reverse('question_detail', args=(10,)))
         self.assertEqual(response.status_code, 404)
+
+    def test_check_object(self):
+        question = Question.objects.all().first()
+        response = self.client.get(reverse('question_detail', args=(question.id,)))
+        self.assertEqual(response.context_data["question"], question)
