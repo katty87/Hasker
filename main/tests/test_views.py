@@ -6,13 +6,15 @@ from django.urls import reverse
 from main.models import Question, Tag
 from user.models import UserProfile
 
+from user.tests.fixtures import UserFactory
+
 
 class IndexViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         number_of_questions = 23
 
-        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserFactory()
         for question_num in range(number_of_questions):
             Question.objects.create(
                 header='How to do thing #{}?'.format(question_num),
@@ -51,7 +53,7 @@ class IndexViewTest(TestCase):
 class SearchViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserFactory()
         question_instance = Question.objects.create(
             header='How to create first Django app?',
             content='I am new at programming. Can anybody recommend me Django tutorial?',
@@ -148,10 +150,10 @@ class SearchViewTest(TestCase):
 
 class AskQuestionViewTest(TestCase):
     def setUp(self):
-        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserFactory()
         user.avatar = 'default_avatar.png'
         user.save()
-        self.client.login(username='user1', password='12345')
+        self.client.login(username=user.username, password='12345')
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get('/main/ask')
@@ -172,7 +174,7 @@ class QuestionDetailViewTest(TestCase):
     def setUpTestData(cls):
         number_of_questions = 3
 
-        user = UserProfile.objects.create_user('user1', 'test@test.com', '12345')
+        user = UserFactory()
         user.avatar = 'default_avatar.png'
         user.save()
         for question_num in range(number_of_questions):
