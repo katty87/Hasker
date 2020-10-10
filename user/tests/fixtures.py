@@ -1,6 +1,6 @@
-import factory
-
 from datetime import datetime
+
+import factory
 
 from user.models import UserProfile
 

@@ -1,5 +1,5 @@
-from Hasker.settings.base import *
 import os
+
 from django.core.exceptions import ImproperlyConfigured
 
 

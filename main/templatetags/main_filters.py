@@ -1,7 +1,9 @@
-from django import template
 from datetime import datetime
-from main.models import QuestionVote
+
+from django import template
 from django.db.models import Sum
+
+from main.models import QuestionVote
 
 register = template.Library()
 

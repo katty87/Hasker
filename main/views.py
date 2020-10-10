@@ -1,8 +1,8 @@
 import json
-
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.models import Sum, Count, When, Case, Exists, OuterRef
@@ -13,14 +13,12 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-
+from Hasker.settings.base import EMAIL_HOST_USER
 from main.aggregates_extension import GroupConcat
 from main.forms import AddQuestionForm, QuestionDetailForm
 from main.models import Question, QuestionVote, Answer, AnswerVote, Tag
 from user.models import UserProfile
-from Hasker.settings.base import EMAIL_HOST_USER
 
 
 class IndexView(generic.ListView):

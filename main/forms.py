@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from main.models import Question, Answer
+from main.models import Question
 
 
 class AddQuestionForm(forms.ModelForm):

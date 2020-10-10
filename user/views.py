@@ -1,9 +1,8 @@
 import os
 
-from django.views import generic
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.views import generic
 from django.views.generic.edit import UpdateView
 
 from user.forms import SignUpForm, UserSettings

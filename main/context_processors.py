@@ -1,8 +1,8 @@
+from django.conf import settings
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
 from .models import Question
-from django.conf import settings
 
 
 def trending_questions(request):

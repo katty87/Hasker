@@ -4,8 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from main.models import Question
-from user.tests.fixtures import UserFactory
 from main.tests.fixtures import QuestionFactory, TagFactory
+from user.tests.fixtures import UserFactory
 
 
 class IndexViewTest(TestCase):

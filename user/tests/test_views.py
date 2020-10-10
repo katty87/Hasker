@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from user.tests.fixtures import UserFactory
-from user.models import UserProfile
 
 
 class SignUpViewTest(TestCase):

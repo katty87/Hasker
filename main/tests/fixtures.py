@@ -1,6 +1,6 @@
-import factory
-
 from datetime import datetime
+
+import factory
 
 from main.models import Question, Tag
 from user.tests.fixtures import UserFactory
