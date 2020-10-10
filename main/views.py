@@ -2,8 +2,6 @@ import json
 
 from datetime import datetime
 
-from django.conf import settings
-
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db.models import Q
@@ -11,7 +9,7 @@ from django.db.models import Sum, Count, When, Case, Exists, OuterRef
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin, CreateView
