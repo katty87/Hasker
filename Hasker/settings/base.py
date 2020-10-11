@@ -1,5 +1,4 @@
 import os
-import django
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,8 +14,6 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'user.apps.UserConfig',
 ]
-
-django.setup()
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

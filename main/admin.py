@@ -1,12 +1,7 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-
-from main.models import UserProfile, Question, Answer, Tag
 
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = UserAdmin.list_display + ('avatar',)
+from main.models import Question, Answer, Tag
 
 
 admin.site.register(Tag)

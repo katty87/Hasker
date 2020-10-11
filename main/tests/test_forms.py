@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from main.forms import AddQuestionForm, QuestionDetailForm
+from main.forms import *
 
 
 class AddQuestionFormTest(TestCase):
