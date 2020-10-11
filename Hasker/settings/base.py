@@ -1,4 +1,5 @@
 import os
+import django
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,6 +15,8 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'user.apps.UserConfig',
 ]
+
+django.setup()
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +60,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Hasker.wsgi.application'
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -85,14 +87,12 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 STATIC_URL = '/static/'
 STATIC_IMAGES_URL = os.path.join(STATIC_URL, "img/")
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
