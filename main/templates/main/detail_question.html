@@ -17,6 +17,19 @@
             cursor: pointer;
             color: orange;
         }
+
+        .answer-mark {
+            font-size:20px;
+            cursor:default;
+            color:#D3D3D3;
+        }
+
+        .answer-owner-mark {
+            font-size:20px;
+            cursor:pointer;
+            color:black;
+        }
+
     </style>
 {% endblock %}
 
@@ -53,7 +66,7 @@
         <div class="fa fa-caret-up {% if answer.current_user_vote == 1 %}active-vote{% else %}vote{% endif %}" id="up-vote-answer-{{ answer.id }}" name="{{ answer.id }}"></div>
         <div id="answer-vote-{{ answer.id }}">{{ answer.vote_sum }}</div>
         <div class="fa fa-caret-down {% if answer.current_user_vote == -1 %}active-vote{% else %}vote{% endif %}"  id="down-vote-answer-{{ answer.id }}" name="{{ answer.id }}" ></div>
-        <p class="{% if user.id == question.user.id %} answer-owner-mark {% else %} anser-mark {% endif %}" id="answer-right-{{ answer.id }}" onclick="onClickAnswerRight({{ answer.id }}, {{ user.id }}, {{ question.user_id }})">{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</p>
+        <div class="{% if user.id == question.user.id %} answer-owner-mark {% else %} anser-mark {% endif %}" id="answer-right-{{ answer.id }}" name="{{ answer.id }}" >{% if answer.is_correct == 1 %}&#9733;{% else %}&#9734;{% endif %}</div>
     </div>
     <div class="col-md-10">
         <p>{{ answer.content|linebreaks  }}</p>
@@ -148,8 +161,13 @@ $(document).ready(function () {
             vote_ans(document.getElementById(this.id).getAttribute("name"), -1);
         });
     }
-  }
 
+    if ( (itemName != null) && (itemName.indexOf("answer-right-") == 0) ) {
+        $("#" + divs[i].getAttribute("id")).click(function() {
+            onClickAnswerRight(document.getElementById(this.id).getAttribute("name"));
+        });
+    }
+  }
 
 
 $("#up-vote").click(function() {
@@ -239,8 +257,8 @@ function vote_ans(id, vote_value) {
 
 }
 
-function onClickAnswerRight(id, user_id, author_id) {
-   if (user_id != author_id) {
+function onClickAnswerRight(id) {
+   if ({{ user.id }} != {{ question.user.id }}) {
     return
    }
 
