@@ -97,6 +97,7 @@ class AskQuestionView(LoginRequiredMixin, CreateView):
     model = Question
     template_name = 'main/add_question.html'
     form_class = AddQuestionForm
+    login_url = '/user/login'
 
     def form_valid(self, form):
         question_instance = form.save(commit=False)
