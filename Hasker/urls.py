@@ -9,4 +9,5 @@ urlpatterns = [
     path('main/', include('main.urls')),
     path('user/', include('user.urls')),
     path('', RedirectView.as_view(url='main/')),
+    path(r'api/', include('api.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
