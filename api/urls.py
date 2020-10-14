@@ -5,7 +5,9 @@ from api.views import *
 
 router = routers.DefaultRouter()
 router.register(r'questions', QuestionViewSet, basename="question")
-#router.register(r'questions/trending', TrendingQuestionViewSet, basename="question-trending")
+router.register(r'questions/trending', TrendingQuestionViewSet, basename="question-trending")
+router.register(r'questions/hot', TrendingQuestionViewSet, basename="question-hot")
+router.register(r'questions/new', TrendingQuestionViewSet, basename="question-new")
 
 question_router = routers.NestedDefaultRouter(router, r'questions', lookup='questions')
 question_router.register(r'answers', AnswerViewSet, basename='question-answers')
