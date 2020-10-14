@@ -19,10 +19,18 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     user = UserProfileSerializer(many=False, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+    answer_cnt = serializers.SerializerMethodField()
+    vote_sum = serializers.SerializerMethodField()
+
+    def get_answer_cnt(self, obj):
+        return obj.answer_cnt
+
+    def get_vote_sum(self, obj):
+        return obj.vote_sum
 
     class Meta:
         model = Question
-        fields = ['header', 'content', 'user', 'create_date', 'tags']
+        fields = ['header', 'content', 'user', 'create_date', 'tags', 'answer_cnt', 'vote_sum']
 
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):

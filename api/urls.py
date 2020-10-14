@@ -8,6 +8,7 @@ router.register(r'questions', QuestionViewSet, basename="question")
 
 question_router = routers.NestedDefaultRouter(router, r'questions', lookup='questions')
 question_router.register(r'answers', AnswerViewSet, basename='question-answers')
+question_router.register(r'trending', TrendingQuestionViewSet, basename='question-trending')
 
 app_name = 'api'
 
