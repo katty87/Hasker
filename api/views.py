@@ -5,9 +5,8 @@ from django.db.models import Q
 from django.db.models import Sum, Count, Exists, OuterRef
 from django.db.models.functions import Coalesce
 
-from api.serializers import QuestionSerializer, AnswerSerializer
+from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerializer
 from main.models import Question, Answer, Tag
-from main.aggregates_extension import GroupConcat
 
 
 class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -31,12 +30,6 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
             .all()
 
 
-class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = QuestionSerializer
-    queryset = Question.objects.annotate(vote_sum=Coalesce(Sum('questionvote__value'), 0)).filter(vote_sum__gt=0) \
-        .order_by('-vote_sum', 'create_date').values('id', 'header', 'vote_sum')[:20]
-
-
 class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnswerSerializer
 
@@ -44,3 +37,12 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
         return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)) \
             .order_by('-vote_sum', 'create_date').all()
+
+
+class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TrendingSerializer
+    queryset = Question.objects \
+        .annotate(vote_sum=Coalesce(Sum('questionvote__value'), 0)) \
+        .filter(vote_sum__gt=0) \
+        .order_by('-vote_sum', 'create_date').all()[:20]
+
