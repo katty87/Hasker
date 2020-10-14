@@ -12,12 +12,27 @@ from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerial
 from main.models import Question, Answer, Tag
 
 
-class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
+class CustomQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionSerializer
     pagination_class = QuestionPagination
 
+    def filter(self, queryset):
+        return queryset
+
+    def orderby(self, queryset):
+        return queryset
+
     def get_queryset(self):
-        queryset = Question.objects.all().order_by('create_date')
+        queryset = Question.objects.all()
+        queryset = queryset \
+            .annotate(answer_cnt=Count('answer', distinct=True),
+                      vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True))
+        queryset = self.filter(queryset)
+        return self.orderby(queryset)
+
+
+class QuestionViewSet(CustomQuestionViewSet):
+    def filter(self, queryset):
         search_string = self.request.query_params.get('search', None)
         if search_string:
             queryset = queryset.filter(Q(header__icontains=search_string) | Q(content__icontains=search_string))
@@ -27,11 +42,21 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 Exists(Tag.objects.filter(question=OuterRef('pk'), name=tag_name))
             )
-        return queryset \
-            .annotate(answer_cnt=Count('answer', distinct=True),
-                      vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True)) \
-            .order_by('-vote_sum', '-create_date') \
-            .all()
+
+        return queryset
+
+    def orderby(self, queryset):
+        return queryset.order_by('-vote_sum', '-create_date')
+
+
+class HotQuestionViewSet(CustomQuestionViewSet):
+    def orderby(self, queryset):
+        return queryset.order_by('-vote_sum', '-create_date')
+
+
+class NewQuestionViewSet(CustomQuestionViewSet):
+    def orderby(self, queryset):
+        return queryset.order_by('-create_date', '-vote_sum', )
 
 
 class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
