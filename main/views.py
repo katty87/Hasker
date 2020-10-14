@@ -27,18 +27,17 @@ class IndexView(generic.ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        order_by = ['-vote_sum', '-create_date'] if self.request.GET.get('ordering', '0') == '1' \
-            else ['-create_date', '-vote_sum']
-
         qs = Question.objects.all() \
             .annotate(answer_cnt=Count('answer', distinct=True),
                       vote_sum=Count('questionvote__id', fiter=Q(questionvote__id=0), distinct=True),
-                      tag_list=GroupConcat('tags__name', distinct=True)) \
-            .order_by(*order_by) \
-            .values('id', 'header', 'create_date', 'user__username', 'user__avatar',
-                    'answer_cnt', 'vote_sum', 'tag_list')
+                      tag_list=GroupConcat('tags__name', distinct=True))
+        if self.request.GET.get('ordering', '0') == '1':
+            qs = qs.order_by('-vote_sum', '-create_date')
+        else:
+            qs = qs.order_by('-create_date', '-vote_sum')
 
-        return qs
+        return qs.values('id', 'header', 'create_date', 'user__username', 'user__avatar', 'answer_cnt', 'vote_sum',
+                         'tag_list')
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)

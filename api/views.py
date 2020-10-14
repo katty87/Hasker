@@ -36,13 +36,13 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)) \
-            .order_by('-vote_sum', 'create_date').all()
+            .order_by('-vote_sum', 'create_date')
 
 
 class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TrendingSerializer
     queryset = Question.objects \
         .annotate(vote_sum=Coalesce(Sum('questionvote__value'), 0)) \
-        .filter(vote_sum__gt=0) \
-        .order_by('-vote_sum', 'create_date').all()[:20]
+        .filter(vote_sum__gt=0)
+    queryset = queryset.order_by('-vote_sum', 'create_date')[:20]
 
