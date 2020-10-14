@@ -41,4 +41,6 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnswerSerializer
 
     def get_queryset(self):
-        return Answer.objects.filter(question=self.kwargs['questions_pk'])
+        return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
+            .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)) \
+            .order_by('-vote_sum', 'create_date').all()

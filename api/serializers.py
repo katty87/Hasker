@@ -34,6 +34,12 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+    user = UserProfileSerializer(many=False, read_only=True)
+    vote_sum = serializers.SerializerMethodField()
+
+    def get_vote_sum(self, obj):
+        return obj.vote_sum
+
     class Meta:
         model = Answer
-        fields = ('content', )
+        fields = ['content', 'user', 'create_date', 'is_correct', 'vote_sum']
