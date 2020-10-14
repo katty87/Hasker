@@ -1,16 +1,20 @@
 from rest_framework import viewsets, renderers
+from rest_framework import generics
 from rest_framework.decorators import action
+from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 from django.db.models import Q
 from django.db.models import Sum, Count, Exists, OuterRef
 from django.db.models.functions import Coalesce
 
+from api.paginators import QuestionPagination, AnswerPagination
 from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerializer
 from main.models import Question, Answer, Tag
 
 
 class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionSerializer
+    pagination_class = QuestionPagination
 
     def get_queryset(self):
         queryset = Question.objects.all().order_by('create_date')
@@ -32,6 +36,7 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnswerSerializer
+    pagination_class = AnswerPagination
 
     def get_queryset(self):
         return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
