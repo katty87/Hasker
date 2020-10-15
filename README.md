@@ -7,7 +7,7 @@ Simple version of stackoverflow.
 
 ### Requirements
 
- - Python 3.0 or later
+ - Python 3.6+
  - Docker
  - Django
  - PosgreSQL

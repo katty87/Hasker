@@ -14,7 +14,7 @@ from django.views import generic
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin, CreateView
 
-from Hasker.settings.base import EMAIL_HOST_USER
+from Hasker.settings.base import EMAIL_HOST_USER, QUESTIONS_PER_PAGE, ANSWERS_PER_PAGE
 from main.aggregates_extension import GroupConcat
 from main.forms import AddQuestionForm, QuestionDetailForm
 from main.models import Question, QuestionVote, Answer, AnswerVote, Tag
@@ -24,7 +24,7 @@ from user.models import UserProfile
 class IndexView(generic.ListView):
     template_name = 'main/index.html'
     context_object_name = 'question_list'
-    paginate_by = 20
+    paginate_by = QUESTIONS_PER_PAGE
 
     def get_queryset(self):
         qs = Question.objects.all() \
@@ -54,7 +54,7 @@ class SearchResultsView(generic.ListView):
     model = Question
     template_name = 'main/search_results.html'
     context_object_name = 'question_list'
-    paginate_by = 20
+    paginate_by = QUESTIONS_PER_PAGE
 
     def get_queryset(self):
         search_string = self.request.GET.get('q', '').strip()
@@ -130,7 +130,7 @@ class QuestionDetailView(ListView, FormMixin):
     model = Answer
     template_name = 'main/detail_question.html'
     context_object_name = 'answer_list'
-    paginate_by = 30
+    paginate_by = ANSWERS_PER_PAGE
 
     def get_queryset(self):
         if self.request.user:

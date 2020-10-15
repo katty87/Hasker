@@ -100,3 +100,13 @@ EMAIL_HOST_USER = 'hasker-info@yandex.ru'
 EMAIL_HOST_PASSWORD = 'hasker123'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+QUESTIONS_PER_PAGE = 20
+ANSWERS_PER_PAGE = 20
