@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework_nested import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from api.views import *
 
@@ -22,7 +22,6 @@ urlpatterns = [
     path('questions/hot/', HotQuestionViewSet.as_view({'get': 'list'})),
     path('questions/new/', NewQuestionViewSet.as_view({'get': 'list'})),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns += router.urls
