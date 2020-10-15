@@ -2,6 +2,8 @@ from rest_framework import viewsets
 from django.db.models import Q
 from django.db.models import Sum, Count, Exists, OuterRef
 from django.db.models.functions import Coalesce
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from api.paginators import QuestionPagination, AnswerPagination
 from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerializer
@@ -11,6 +13,9 @@ from main.models import Question, Answer, Tag
 class CustomQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionSerializer
     pagination_class = QuestionPagination
+
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def filter(self, queryset):
         return queryset
@@ -59,6 +64,9 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnswerSerializer
     pagination_class = AnswerPagination
 
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
     def get_queryset(self):
         return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)) \
@@ -67,6 +75,9 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
 
 class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TrendingSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
     queryset = Question.objects \
         .annotate(vote_sum=Coalesce(Sum('questionvote__value'), 0)) \
         .filter(vote_sum__gt=0)
