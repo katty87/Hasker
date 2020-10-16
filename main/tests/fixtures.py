@@ -2,7 +2,7 @@ from datetime import datetime
 
 import factory
 
-from main.models import Question, Tag
+from main.models import Question, Tag, QuestionVote
 from user.tests.fixtures import UserFactory
 
 
@@ -11,6 +11,14 @@ class TagFactory(factory.django.DjangoModelFactory):
         model = Tag
 
     name = factory.Sequence(lambda n: "tag%s" % n)
+
+
+class QuestionVoteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = QuestionVote
+
+    value = 1
+    user = factory.SubFactory(UserFactory)
 
 
 class QuestionFactory(factory.django.DjangoModelFactory):

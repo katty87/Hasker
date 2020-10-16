@@ -4,18 +4,19 @@ from django.db.models import Sum, Count, Exists, OuterRef
 from django.db.models.functions import Coalesce
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from rest_framework import generics
 
 from api.paginators import QuestionPagination, AnswerPagination
 from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerializer
 from main.models import Question, Answer, Tag
 
 
-class CustomQuestionViewSet(viewsets.ReadOnlyModelViewSet):
+class CustomQuestionViewSet(generics.ListAPIView):
     serializer_class = QuestionSerializer
     pagination_class = QuestionPagination
 
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
+    #permission_classes = (IsAuthenticated,)
+    #authentication_classes = (TokenAuthentication,)
 
     def filter(self, queryset):
         return queryset
@@ -60,7 +61,7 @@ class NewQuestionViewSet(CustomQuestionViewSet):
         return queryset.order_by('-create_date', '-vote_sum', )
 
 
-class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
+class AnswerViewSet(generics.ListAPIView):
     serializer_class = AnswerSerializer
     pagination_class = AnswerPagination
 
@@ -68,12 +69,12 @@ class AnswerViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
-        return Answer.objects.filter(question_id=self.kwargs['questions_pk']) \
+        return Answer.objects.filter(question_id=self.kwargs['id']) \
             .annotate(vote_sum=Coalesce(Sum('answervote__value'), 0)) \
             .order_by('-vote_sum', 'create_date')
 
 
-class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
+class TrendingQuestionViewSet(generics.ListAPIView):
     serializer_class = TrendingSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
@@ -82,4 +83,14 @@ class TrendingQuestionViewSet(viewsets.ReadOnlyModelViewSet):
         .annotate(vote_sum=Coalesce(Sum('questionvote__value'), 0)) \
         .filter(vote_sum__gt=0)
     queryset = queryset.order_by('-vote_sum', 'create_date')[:20]
+
+
+class QuestionDetailView(generics.RetrieveAPIView):
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    lookup_field = 'id'
+    queryset = Question.objects.annotate(answer_cnt=Count('answer', distinct=True),
+                                         vote_sum=Count('questionvote__id', fiter=~Q(questionvote__value=0), distinct=True))
 
