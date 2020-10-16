@@ -6,11 +6,12 @@ from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 from django.db.models import Q
 from django.db.models import Exists, OuterRef
+from django.db.models.aggregates import Max
 
 from user.tests.fixtures import UserFactory
-from main.tests.fixtures import QuestionFactory, TagFactory, QuestionVoteFactory
-from Hasker.settings.base import QUESTIONS_PER_PAGE
-from main.models import Question, Tag
+from main.tests.fixtures import QuestionFactory, TagFactory, QuestionVoteFactory, AnswerFactory
+from Hasker.settings.base import QUESTIONS_PER_PAGE, ANSWERS_PER_PAGE
+from main.models import Question, Tag, Answer
 
 
 class AuthTests(APITestCase):
@@ -141,5 +142,44 @@ class QuestionListTests(APITestCase):
         self.assertEqual(response.data['header'], question.header)
         self.assertEqual(response.data['content'], question.content)
 
+    def test_question_detail_not_found(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
 
+        url = reverse('api:question-detail', args=[Question.objects.aggregate(Max('id'))['id__max'] + 1])
+        response = client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class AnswerListTests(APITestCase):
+    HOT_QUESTION_HEADER = "hot question"
+    YESTERDAY_QUESTION_HEADER = "yesterday question"
+
+    @classmethod
+    def setUpTestData(cls):
+        question = QuestionFactory.create()
+
+        for i in range(ANSWERS_PER_PAGE + 3):
+            AnswerFactory.create(question=question)
+
+    def setUp(self):
+        user = UserFactory.create()
+        self.token = Token.objects.get_or_create(user=user)[0].key
+
+    def test_get_question_answers(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+
+        question = Question.objects.first()
+
+        url = reverse('api:question-answers', args=[question.id])
+        response = client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), ANSWERS_PER_PAGE)
+
+        url = reverse('api:question-answers', args=[question.id])
+        response = client.get(url, {'page': 2}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']),
+                         len(Answer.objects.filter(question_id=question.id)) - ANSWERS_PER_PAGE)
 

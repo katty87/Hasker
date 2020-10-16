@@ -2,7 +2,7 @@ from datetime import datetime
 
 import factory
 
-from main.models import Question, Tag, QuestionVote
+from main.models import Question, Tag, QuestionVote, Answer
 from user.tests.fixtures import UserFactory
 
 
@@ -39,4 +39,14 @@ class QuestionFactory(factory.django.DjangoModelFactory):
         if extracted:
             for tag in extracted:
                 self.tags.add(tag)
+
+
+class AnswerFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Answer
+
+    content = factory.Sequence(lambda n: 'Answer content #%s' % n)
+    user = factory.SubFactory(UserFactory)
+    create_date = factory.LazyFunction(datetime.now)
+    is_correct = False
 
