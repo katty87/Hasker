@@ -85,11 +85,11 @@ class AnswerModelTests(TestCase):
         UserFactory.create_batch(3)
 
     def test_no_votes_sum(self):
-        answer = Answer.objects.get(id=1)
+        answer = Answer.objects.first()
         self.assertEqual(answer.vote_sum(), 0)
 
     def test_cancel_vote_sum(self):
-        answer = Answer.objects.get(id=1)
+        answer = Answer.objects.first()
 
         answer_vote = AnswerVote()
         answer_vote.answer = answer
