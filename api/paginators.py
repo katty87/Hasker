@@ -1,5 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
-from Hasker.settings.base import EMAIL_HOST_USER, QUESTIONS_PER_PAGE, ANSWERS_PER_PAGE
+
+from Hasker.settings.base import QUESTIONS_PER_PAGE, ANSWERS_PER_PAGE
 
 
 class QuestionPagination(PageNumberPagination):

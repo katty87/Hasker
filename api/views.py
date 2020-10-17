@@ -1,10 +1,9 @@
-from rest_framework import viewsets
 from django.db.models import Q
 from django.db.models import Sum, Count, Exists, OuterRef
 from django.db.models.functions import Coalesce
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from rest_framework import generics
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from api.paginators import QuestionPagination, AnswerPagination
 from api.serializers import QuestionSerializer, AnswerSerializer, TrendingSerializer

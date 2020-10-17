@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_extensions',
+    'drf_yasg',
     'main.apps.MainConfig',
     'user.apps.UserConfig',
 ]
@@ -107,8 +108,10 @@ EMAIL_USE_SSL = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
+
 
 QUESTIONS_PER_PAGE = 20
 ANSWERS_PER_PAGE = 20

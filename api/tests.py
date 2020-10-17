@@ -1,17 +1,18 @@
+from datetime import datetime, timedelta
+
+from django.db.models import Exists, OuterRef
+from django.db.models import Q
+from django.db.models.aggregates import Max
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from datetime import datetime, timedelta
-from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
-from django.db.models import Q
-from django.db.models import Exists, OuterRef
-from django.db.models.aggregates import Max
+from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 
-from user.tests.fixtures import UserFactory
-from main.tests.fixtures import QuestionFactory, TagFactory, QuestionVoteFactory, AnswerFactory
 from Hasker.settings.base import QUESTIONS_PER_PAGE, ANSWERS_PER_PAGE
 from main.models import Question, Tag, Answer
+from main.tests.fixtures import QuestionFactory, TagFactory, QuestionVoteFactory, AnswerFactory
+from user.tests.fixtures import UserFactory
 
 
 class AuthTests(APITestCase):

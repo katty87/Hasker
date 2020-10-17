@@ -93,6 +93,25 @@ GET /api/questions/hot
 | `page` | `integer` | Page number |
 | `page_size` | `integer` | Number of answers by page. Default: 20 |
 
+#### Get API documentation
+
+Return  swagger scheme. Without format parameter return UI scheme
+
+```http
+GET /api/swagger
+```
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `format` | `string` | Format type: .json|.yaml |
+
+
+Documentation
+
+```http
+GET /api/redoc
+```
+
 ### Tests 
 
 Tests run automatically after container build. If you want to run them manually use
