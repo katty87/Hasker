@@ -103,7 +103,7 @@ class AnswerModelTests(TestCase):
         self.assertEqual(answer.vote_sum(), 0)
 
     def test_below_zero_vote_sum(self):
-        answer = Answer.objects.get(id=1)
+        answer = Answer.objects.first()
         users = UserProfile.objects.exclude(id=answer.user.id)
 
         vote_answer(answer, users[0], -1)
@@ -113,7 +113,7 @@ class AnswerModelTests(TestCase):
         self.assertEqual(answer.vote_sum(), -1)
 
     def test_above_zero_vote_sum(self):
-        answer = Answer.objects.get(id=1)
+        answer = Answer.objects.first()
         users = UserProfile.objects.exclude(id=answer.user.id)
 
         vote_answer(answer, users[0], 1)
@@ -123,7 +123,7 @@ class AnswerModelTests(TestCase):
         self.assertEqual(answer.vote_sum(), 1)
 
     def test_current_user_vote(self):
-        answer = Answer.objects.get(id=1)
+        answer = Answer.objects.first()
         user = UserProfile.objects.exclude(id=answer.user.id)[0]
 
         vote_answer(answer, user, 1)
